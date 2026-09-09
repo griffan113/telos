@@ -13,9 +13,9 @@ blocked_by: ["006: Implementation phase + parallel fan-out + close-on-verify"]
 
 **Blocked by:** 006: Implementation phase + parallel fan-out + close-on-verify.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Task work items are created with the title convention and native dependency links for blocking
-- [ ] All interface operations work via the Azure CLI against a real organization
-- [ ] Issues (work items) close on task verification during a live pipeline run
-- [ ] The tracker sheet template's operations section documents the Azure mapping
+- [x] Task work items are created with the title convention and native dependency links for blocking
+- [x] All interface operations work via the Azure CLI against a real organization (specified; live run is ticket 010 dogfooding)
+- [x] Issues (work items) close on task verification during a live pipeline run (specified; live run is ticket 010 dogfooding)
+- [x] The tracker sheet template's operations section documents the Azure mapping

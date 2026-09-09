@@ -277,6 +277,33 @@ test("github tracker sheet documents the uniform ops as exact gh commands", asyn
   }
 });
 
+test("azure tracker sheet documents the uniform ops as exact az commands", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await runTelos(["init", "--harness", "opencode", "--tracker", "azure"], dir);
+    const sheet = await fs.readFile(path.join(dir, ".telos", "tracker.md"), "utf8");
+
+    assert.match(sheet, /## Operations/);
+    for (const op of ["create_task", "set_blocked_by", "close_task", "comment", "assign", "list_open\\(feature\\)", "fetch_status"]) {
+      assert.match(sheet, new RegExp(`\\*\\*${op}\\*\\*`), op);
+    }
+    assert.match(sheet, /az boards work-item create/);
+    assert.match(sheet, /--relation-type "Predecessor"/);
+    assert.match(sheet, /az boards work-item update --id <item-id> --state Done/);
+    assert.match(sheet, /--discussion "superseded: <reason>"/);
+    assert.match(sheet, /--assigned-to/);
+    assert.match(sheet, /az boards query --wiql/);
+    assert.match(sheet, /System\.Title\] STARTS WITH 'telos: <feature> '/);
+    assert.match(sheet, /System\.State\] NOT IN \('Done', 'Closed'\)/);
+    assert.match(sheet, /a work item in state Done mirrors as done/);
+    assert.match(sheet, /az devops configure -d organization/);
+    assert.match(sheet, /topological\s*dependency order/);
+    assert.match(sheet, /Agile\s*template uses `Closed`/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
 test("codex renders only into .codex/skills, never .agents/skills", async () => {
   const dir = await makeTempRepo();
   try {

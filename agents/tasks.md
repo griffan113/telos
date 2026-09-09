@@ -64,9 +64,12 @@ First approval sync:
   tasks table and each TASK.md's `issue` frontmatter. On a cascade
   re-approval, the re-plan diff's removed and changed tasks are closed with
   a `superseded:` comment via the `comment` op.
-- **azure** — for each task: `az boards` Task work item titled
-  `telos: <feature> NN <slug>`, native dependency links for `depends_on`.
-  Record the work item IDs the same way.
+- **azure** — create one Task work item per task per the Operations section
+  of the tracker sheet (`.telos/tracker.md`): title `telos: <feature> NN
+  <slug>`, native Predecessor/Successor dependency links for `depends_on`.
+  Record the work item IDs the same way. On a cascade re-approval, the
+  re-plan diff's removed and changed tasks are closed with a `superseded:`
+  comment via the `comment` op.
 
 ## Gate
 
