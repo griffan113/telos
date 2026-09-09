@@ -93,6 +93,46 @@ test("rendered agents can resolve their required references from the body", asyn
   }
 });
 
+test("rendered pipeline v1 carries gates, hard-stops, and traceability", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const read = (name) =>
+      fs.readFile(path.join(dir, ".opencode", "agent", name), "utf8");
+    const ref = await fs.readFile(
+      path.join(dir, ".telos", "references", "pipeline.md"),
+      "utf8"
+    );
+
+    const orchestrator = await read("telos-orchestrator.md");
+    assert.match(orchestrator, /## "start telos"/);
+    assert.match(orchestrator, /hard-stop until this flow has run/);
+    assert.match(orchestrator, /only `\{feature, phase\}`/);
+    assert.match(orchestrator, /identical code path/);
+    assert.match(orchestrator, /never approve on the user's behalf/);
+    assert.match(orchestrator, /Rewrite `\.telos\/project\/STATE\.md` wholesale/);
+
+    const specify = await read("telos-specify.md");
+    assert.match(specify, /Run 'start telos' first — PROJECT\.md does not exist\./);
+    assert.match(specify, /not `status: approved`, hard-stop/);
+    assert.match(specify, /never renumbered once written/);
+    assert.match(specify, /read from `\.telos\/telos\.json`/);
+    assert.match(specify, /AGENTS\.md, CLAUDE\.md/);
+
+    const contracts = await read("telos-contracts.md");
+    assert.match(contracts, /depends_on: \[spec\]/);
+    assert.match(contracts, /Serves: REQ-3/);
+    assert.match(contracts, /stub spec never feeds a Contracts phase/);
+    assert.match(contracts, /not `status: approved`, hard-stop/);
+
+    assert.match(ref, /never renumbered once/);
+    assert.match(ref, /recorded by the phase at gate approval/);
+    assert.match(ref, /never\s+hand-edited/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
 test("codex renders only into .codex/skills, never .agents/skills", async () => {
   const dir = await makeTempRepo();
   try {

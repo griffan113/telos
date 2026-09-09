@@ -5,6 +5,26 @@ One orchestrator agent drives every feature through five phases, pausing for
 explicit human approval at every phase transition. This document is the shared
 context every Telos agent reads first.
 
+## Project initialization ("start telos")
+
+Before any feature work exists, the orchestrator runs the "start telos" flow:
+
+1. Interview the user about the project: what it is, who it serves, what
+   success looks like. Analyze the actual codebase live for grounding.
+2. Write `.telos/project/PROJECT.md` — purpose, users, goals, non-goals — and
+   `.telos/project/ROADMAP.md` — ordered milestones or themes, no task-level
+   detail. All prose in the configured artifact language.
+3. Present both for an approval gate. Revise and re-present on request
+   changes; nothing proceeds unapproved.
+4. Feature phases hard-stop until this has run. If PROJECT.md or ROADMAP.md
+   is missing, the message is exactly: `Run 'start telos' first — PROJECT.md
+   does not exist.` (name the missing file).
+
+These are orchestrator-owned project files, not phase artifacts: the
+orchestrator writes them itself and gates them directly. They carry the
+artifact frontmatter too (`phase: project` / `phase: roadmap`,
+`status: draft`, then approved).
+
 ## The five phases
 
 1. **Specification** — capture requirements with traceable IDs (`REQ-NN`) into
@@ -25,10 +45,10 @@ Every artifact carries:
 
 ```yaml
 ---
-phase: specification        # specification | contracts | design | tasks | implementation
+phase: specification        # specification | contracts | design | tasks | implementation | project | roadmap
 status: draft               # draft | approved | stale
 approved_at: 2026-09-09T12:00:00Z   # set at gate approval
-content_hash: <md5 of file>         # recorded by the orchestrator at approval
+content_hash: <md5 of file>         # recorded by the phase at gate approval
 depends_on: []              # artifact keys this one derives from
 ---
 ```
@@ -44,8 +64,9 @@ that language. Agent instructions (like this document) stay in English. The
   and stops: **approve** or **request changes** (+ feedback).
 - "Request changes" loops the phase back to revision and re-presentation at the
   same gate. Nothing advances on an unapproved artifact.
-- An approved artifact's frontmatter becomes `status: approved` with
-  `approved_at` set, and the orchestrator records its `content_hash`.
+- On the orchestrator's approval signal, the phase itself writes the approval
+  frontmatter: `status: approved`, `approved_at`, and its `content_hash`
+  (computed with a shell command). This works identically standalone.
 
 ## Staleness and cascade
 
@@ -60,12 +81,76 @@ that language. Agent instructions (like this document) stay in English. The
 - The orchestrator passes only `{feature, phase}`. Each phase agent reads all
   context from disk: the feature's upstream artifacts under
   `.telos/features/<feature>/`, the project files under `.telos/project/`, and
-  the reference docs listed in its frontmatter.
-- A phase invoked with a missing upstream artifact hard-stops with a precise
-  message naming the artifact to produce first. Never generate a stub spec to
-  satisfy a downstream phase.
+  the reference docs listed in its frontmatter. Never inline upstream
+  artifacts or other context in the dispatch message — the only conversational
+  addition is the user's revision feedback on a re-present.
 - Return value: the artifact path, its frontmatter status, and a summary of at
   most 10 lines.
+
+## Phase prerequisites and hard-stops
+
+A phase invoked with a missing or unapproved upstream artifact hard-stops with
+a precise message naming the artifact to produce first. Never generate a stub
+to satisfy a downstream phase.
+
+| Phase | Needs on disk | Hard-stop message names |
+|---|---|---|
+| Specification | `.telos/project/PROJECT.md` and `.telos/project/ROADMAP.md`, both `status: approved` | the missing or unapproved project file |
+| Contracts | `.telos/features/<feature>/spec.md` with `status: approved` | spec.md |
+| Design | `contracts.md` approved | contracts.md |
+| Tasks | `design.md` approved | design.md |
+| Implementation | `tasks.md` approved and synced | tasks.md |
+
+An upstream artifact in `draft` or `stale` status is also a hard-stop: the
+message names the artifact and its status.
+
+## Specification artifact
+
+`.telos/features/<feature>/spec.md`, frontmatter `phase: specification`,
+`depends_on: []`. Body:
+
+- **Goal** — one paragraph, from the user's own words.
+- **Scope / non-goals** — explicit.
+- **Requirements** — numbered `REQ-1`, `REQ-2`, … never renumbered once
+  written; traceability keys for every downstream artifact.
+- **Acceptance criteria** — per requirement, observable from the outside.
+
+Elicit, don't assume: interview the user, propose a draft, refine. Analyze the
+actual codebase live wherever requirements touch code, and read the consumer
+repo's own instruction files (AGENTS.md, CLAUDE.md) for conventions. Telos
+maintains no codebase documentation of its own.
+
+## Contracts artifact
+
+`.telos/features/<feature>/contracts.md`, frontmatter `phase: contracts`,
+`depends_on: [spec]`. Pins the machine-readable interfaces that design and
+tasks must validate against:
+
+- Exported types and function signatures.
+- API request/response shapes.
+- Module boundaries and ownership.
+
+Key every contract to the spec requirement IDs it serves (`Serves: REQ-3`).
+Prose in the artifact language; the interface definitions themselves stay in
+code syntax. Contracts are keyed to approved requirement IDs — if the spec
+changed, it is re-approved first and Contracts re-runs through its gate.
+
+## Feature naming
+
+The orchestrator derives the feature slug from the user's description: ASCII,
+lowercase, hyphenated (`auth-rate-limit`). The slug is stable for the life of
+the feature; artifacts and tracker titles reference it.
+
+## STATE.md
+
+`.telos/project/STATE.md` is generated by the orchestrator, rewritten
+wholesale after every gate approval, task status change, or cascade, and never
+hand-edited. Sections:
+
+- **Phase status table** — one row per feature and phase, local truth.
+- **Mirrored task table** — tracker truth for cloud modes (github/azure); a
+  generated view of the task files for the local tracker.
+- **Decisions & blockers** — recorded during gates and execution.
 
 ## Tracker
 

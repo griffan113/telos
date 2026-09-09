@@ -13,13 +13,13 @@ blocked_by: ["003: Neutral agent definitions + four harness adapters + update ru
 
 **Blocked by:** 003: Neutral agent definitions + four harness adapters + update rules.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Artifact prose and agent conversation follow the language recorded in telos.json; instruction prompts stay English
-- [ ] Agents read code live and consumer instruction files for conventions; no Telos-maintained codebase docs exist
-- [ ] "start telos" creates and gate-approves PROJECT.md + ROADMAP.md; feature phases refuse to run before it has run
-- [ ] Specification and Contracts produce real, gate-approved artifacts with requirement-ID traceability
-- [ ] Gates never auto-advance; revision re-presents at the same gate
-- [ ] Standalone phase invocation reconstructs context from disk and hard-stops on missing upstream artifacts
-- [ ] Orchestrated dispatch passes only feature + phase; the phase agent's return is artifact path, status, and a short summary
-- [ ] STATE.md reflects phase statuses and is rewritten by the orchestrator, never hand-edited
+- [x] Artifact prose and agent conversation follow the language recorded in telos.json; instruction prompts stay English
+- [x] Agents read code live and consumer instruction files for conventions; no Telos-maintained codebase docs exist
+- [x] "start telos" creates and gate-approves PROJECT.md + ROADMAP.md; feature phases refuse to run before it has run
+- [x] Specification and Contracts produce real, gate-approved artifacts with requirement-ID traceability
+- [x] Gates never auto-advance; revision re-presents at the same gate
+- [x] Standalone phase invocation reconstructs context from disk and hard-stops on missing upstream artifacts
+- [x] Orchestrated dispatch passes only feature + phase; the phase agent's return is artifact path, status, and a short summary
+- [x] STATE.md reflects phase statuses and is rewritten by the orchestrator, never hand-edited
