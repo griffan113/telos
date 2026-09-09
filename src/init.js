@@ -1,14 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { createRequire } from "node:module";
 import { CliError } from "./cli.js";
 import { HARNESS_IDS, HARNESS_LABELS, TRACKER_IDS, detectHarnesses, detectRemote } from "./detect.js";
+import { version } from "./version.js";
 import { closePrompts, isTTY, promptHarnesses, promptLanguage, promptTracker } from "./prompts.js";
+import { writeRendered } from "./render.js";
 import { scaffold } from "./scaffold.js";
-
-const require = createRequire(import.meta.url);
-const { version } = require("../package.json");
 
 export async function init(flags) {
   try {
@@ -40,11 +37,14 @@ export async function init(flags) {
       harnesses,
     });
 
+    const rendered = await writeRendered(cwd, harnesses, version);
+
     console.log(`
 Telos ${version} initialized in .telos/
   tracker:   ${tracker}
   language:  ${language}
   harnesses: ${harnesses.map((h) => HARNESS_LABELS[h]).join(", ")}
+  agents:    ${rendered.written.length} rendered${rendered.skipped.length ? `, ${rendered.skipped.length} skipped (user-owned)` : ""}
 
 Next: open your AI harness and say: start telos
 `);

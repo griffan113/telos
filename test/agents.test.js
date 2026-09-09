@@ -1,0 +1,218 @@
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import path from "node:path";
+import test from "node:test";
+import { makeTempRepo, removeTemp, repoRoot, runTelos } from "./helpers.js";
+
+const packageVersion = JSON.parse(
+  await fs.readFile(path.join(repoRoot, "package.json"), "utf8")
+).version;
+
+const MARKER = `<!-- telos:generated v${packageVersion} -->`;
+
+const AGENT_NAMES = [
+  "telos-orchestrator",
+  "telos-specify",
+  "telos-contracts",
+  "telos-design",
+  "telos-tasks",
+  "telos-implement",
+];
+
+const HARNESS_PATHS = {
+  "opencode": (name) => `.opencode/agent/${name}.md`,
+  "claude-code": (name) => `.claude/agents/${name}.md`,
+  "copilot": (name) => `.github/chatmodes/${name}.chatmode.md`,
+  "codex": (name) => `.codex/skills/${name}/SKILL.md`,
+};
+
+async function init(dir, harnesses) {
+  const result = await runTelos(["init", "--harness", harnesses.join(",")], dir);
+  assert.equal(result.code, 0, `${result.out}\n${result.err}`);
+  return result;
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const MARKER_RE = new RegExp(escapeRegExp(MARKER));
+
+test("init renders all six agents with the generated marker, for every harness", async () => {
+  for (const harness of Object.keys(HARNESS_PATHS)) {
+    const dir = await makeTempRepo();
+    try {
+      await init(dir, [harness]);
+      for (const name of AGENT_NAMES) {
+        const relPath = HARNESS_PATHS[harness](name);
+        const text = await fs.readFile(path.join(dir, relPath), "utf8");
+        assert.match(text, MARKER_RE, `${relPath} lacks the marker`);
+        assert.match(text, /You are (the|a)/, `${relPath} has no prompt body`);
+      }
+    } finally {
+      await removeTemp(dir);
+    }
+  }
+});
+
+test("each harness render carries its native frontmatter", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode", "claude-code", "copilot", "codex"]);
+    const read = (harness, name) =>
+      fs.readFile(path.join(dir, HARNESS_PATHS[harness](name)), "utf8");
+
+    assert.match(await read("opencode", "telos-specify"), /mode: subagent/);
+    assert.match(await read("opencode", "telos-orchestrator"), /mode: all/);
+    assert.match(await read("claude-code", "telos-orchestrator"), /name: telos-orchestrator/);
+    assert.match(await read("copilot", "telos-tasks"), /description:/);
+    assert.match(await read("codex", "telos-implement"), /name: telos-implement/);
+
+    const copilotOrchestrator = await read("copilot", "telos-orchestrator");
+    assert.match(copilotOrchestrator, /Harness note \(VS Code Copilot\)/);
+    assert.match(copilotOrchestrator, /single-context/);
+    const codexOrchestrator = await read("codex", "telos-orchestrator");
+    assert.match(codexOrchestrator, /Harness note \(Codex\)/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("rendered agents can resolve their required references from the body", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const text = await fs.readFile(
+      path.join(dir, ".opencode", "agent", "telos-specify.md"),
+      "utf8"
+    );
+    assert.match(text, /## Required references/);
+    assert.match(text, /- \.telos\/references\/pipeline\.md/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("codex renders only into .codex/skills, never .agents/skills", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["codex"]);
+    await assert.rejects(fs.access(path.join(dir, ".agents")));
+    await assert.rejects(fs.access(path.join(dir, "AGENTS.md")));
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("init copies the pipeline reference into .telos/references", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const text = await fs.readFile(path.join(dir, ".telos", "references", "pipeline.md"), "utf8");
+    assert.match(text, /five phases/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("update refuses to run on an uninitialized repo", async () => {
+  const dir = await makeTempRepo();
+  try {
+    const result = await runTelos(["update"], dir);
+    assert.notEqual(result.code, 0);
+    assert.match(result.err, /not initialized/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("update reports a corrupt telos.json as corrupt, not uninitialized", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await fs.mkdir(path.join(dir, ".telos"), { recursive: true });
+    await fs.writeFile(path.join(dir, ".telos", "telos.json"), "{ not json");
+    const result = await runTelos(["update"], dir);
+    assert.notEqual(result.code, 0);
+    assert.match(result.err, /not valid JSON/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("update overwrites marker-carrying files unconditionally", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const target = path.join(dir, ".opencode", "agent", "telos-specify.md");
+    await fs.writeFile(target, "<!-- telos:generated v0.0.1 -->\n\nmy hand edit\n");
+    const result = await runTelos(["update"], dir);
+    assert.equal(result.code, 0, `${result.out}\n${result.err}`);
+    const text = await fs.readFile(target, "utf8");
+    assert.doesNotMatch(text, /my hand edit/);
+    assert.match(text, MARKER_RE);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("update warns and skips user-owned files (no marker)", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const target = path.join(dir, ".opencode", "agent", "telos-specify.md");
+    const userContent = "---\nname: telos-specify\n---\n\nmy own agent\n";
+    await fs.writeFile(target, userContent);
+
+    const marked = path.join(dir, ".opencode", "agent", "telos-design.md");
+    await fs.writeFile(marked, `${MARKER}\n\nmutated\n`);
+
+    const result = await runTelos(["update"], dir);
+    assert.equal(result.code, 0, `${result.out}\n${result.err}`);
+    assert.match(result.err, /telos-specify\.md/);
+    assert.match(result.err, /user-owned/);
+    assert.equal(await fs.readFile(target, "utf8"), userContent);
+    assert.doesNotMatch(await fs.readFile(marked, "utf8"), /mutated/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("update migrates telos.json additively and prints the changelog", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const configPath = path.join(dir, ".telos", "telos.json");
+    const config = JSON.parse(await fs.readFile(configPath, "utf8"));
+    delete config.language;
+    await fs.writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
+
+    const result = await runTelos(["update"], dir);
+    assert.equal(result.code, 0, `${result.out}\n${result.err}`);
+    assert.match(result.out, /Additive migrations applied/);
+    assert.match(result.out, /added missing key "language"/);
+
+    const migrated = JSON.parse(await fs.readFile(configPath, "utf8"));
+    assert.equal(migrated.language, "English");
+    assert.equal(migrated.tracker, "local");
+    assert.deepEqual(migrated.harnesses, ["opencode"]);
+    assert.equal(migrated.telos_version, packageVersion);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("update re-renders only the harnesses configured in telos.json", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const result = await runTelos(["update"], dir);
+    assert.equal(result.code, 0, `${result.out}\n${result.err}`);
+    assert.match(result.out, /OpenCode/);
+    assert.doesNotMatch(result.out, /Claude Code|Copilot|Codex/);
+    await assert.rejects(fs.access(path.join(dir, ".claude")));
+    await assert.rejects(fs.access(path.join(dir, ".codex")));
+    await assert.rejects(fs.access(path.join(dir, ".github")));
+  } finally {
+    await removeTemp(dir);
+  }
+});

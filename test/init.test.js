@@ -228,14 +228,3 @@ test("re-running init is non-destructive and reports current state", async () =>
     await removeTemp(dir);
   }
 });
-
-test("update reports itself as not yet implemented", async () => {
-  const dir = await makeTempRepo();
-  try {
-    const result = await runTelos(["update"], dir);
-    assert.notEqual(result.code, 0);
-    assert.match(result.err, /not implemented/);
-  } finally {
-    await removeTemp(dir);
-  }
-});

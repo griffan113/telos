@@ -9,6 +9,8 @@
   },
   "files": [
     "bin/",
+    "agents/",
+    "adapters/",
     "src/",
     "references/"
   ],

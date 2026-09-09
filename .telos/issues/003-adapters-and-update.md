@@ -13,10 +13,10 @@ blocked_by: ["002: Package skeleton + telos init core"]
 
 **Blocked by:** 002: Package skeleton + telos init core.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Init renders all six agents into every selected harness's native directory, multi-select supported
-- [ ] Each generated file carries the generated-marker comment with the framework version
-- [ ] Update overwrites marker-carrying files and warns-and-skips unmarked (user-owned) files
-- [ ] Update never touches `.telos/` content outside additive migrations with a printed changelog
-- [ ] The CLI test suite asserts renders for all four harnesses, including the marker overwrite/skip rules
+- [x] Init renders all six agents into every selected harness's native directory, multi-select supported
+- [x] Each generated file carries the generated-marker comment with the framework version
+- [x] Update overwrites marker-carrying files and warns-and-skips unmarked (user-owned) files
+- [x] Update never touches `.telos/` content outside additive migrations with a printed changelog
+- [x] The CLI test suite asserts renders for all four harnesses, including the marker overwrite/skip rules
