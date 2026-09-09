@@ -1,0 +1,6 @@
+node_modules/
+
+.opencode/
+.claude/
+.codex/
+.github/chatmodes/

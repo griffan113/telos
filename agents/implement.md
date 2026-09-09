@@ -19,6 +19,10 @@ order:
 3. The feature's `tasks.md` and the task's own
    `tasks/NN-slug/TASK.md` — if the task set is missing, hard-stop with a
    precise message: "Produce tasks.md first (run the Tasks phase)."
+4. If the task's frontmatter is not `status: pending` or `in-progress`,
+   hard-stop naming its actual status (a done task is never re-executed
+   silently). If any task in its `depends_on` is not `status: done`,
+   hard-stop naming the blocking tasks — never execute a blocked task.
 
 ## Execution
 
@@ -26,11 +30,13 @@ order:
    repo's conventions (read its AGENTS.md / CLAUDE.md). Use the actual code,
    analyzed live.
 2. Run the task's verification plan to completion. A task without passing
-   verification is never done.
+   verification is never done. Record the evidence in the task's TASK.md
+   body: the commands run and the results observed.
 3. Commit the task's changes atomically (one logical change per commit).
 4. Mark the task done: set `status: done` in the TASK.md frontmatter, update
-   the tasks table row, close the task's tracker issue (local: the task file
-   is the tracker; github: `gh issue close`; azure: close the work item).
+   the tasks table row, and close the task's tracker issue via the tracker's
+   `close_task` op per `.telos/tracker.md` (local: the task file is the
+   tracker — nothing to close).
 5. Report what changed, what was verified, and anything discovered that
    upstream artifacts got wrong (the orchestrator turns this into a cascade).
 

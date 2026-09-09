@@ -13,10 +13,10 @@ blocked_by: ["005: Design + Tasks phases + local tracker semantics"]
 
 **Blocked by:** 005: Design + Tasks phases + local tracker semantics.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The orchestrator computes the ready set from `depends_on` and dispatches independent tasks in parallel
-- [ ] Per-task verification is enforced before a task is marked done
-- [ ] Tracker issues close automatically on task verification
-- [ ] Copilot/Codex run the same pipeline semantics via prompt-swap emulation
-- [ ] The feature's closing gate presents the verified task table and requires explicit approval
+- [x] The orchestrator computes the ready set from `depends_on` and dispatches independent tasks in parallel
+- [x] Per-task verification is enforced before a task is marked done
+- [x] Tracker issues close automatically on task verification
+- [x] Copilot/Codex run the same pipeline semantics via prompt-swap emulation
+- [x] The feature's closing gate presents the verified task table and requires explicit approval

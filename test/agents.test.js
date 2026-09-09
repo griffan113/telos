@@ -165,6 +165,43 @@ test("rendered planning phases carry sizing, graphs, and local-tracker semantics
   }
 });
 
+test("rendered execution carries ready sets, close-on-verify, and the closing gate", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode", "copilot"]);
+    const read = (harness, name) =>
+      fs.readFile(path.join(dir, HARNESS_PATHS[harness](name)), "utf8");
+    const ref = await fs.readFile(
+      path.join(dir, ".telos", "references", "pipeline.md"),
+      "utf8"
+    );
+
+    const orchestrator = await read("opencode", "telos-orchestrator");
+    assert.match(orchestrator, /a task is ready when every task in its\s+`depends_on` is done/);
+    assert.match(orchestrator, /fan out parallel Implementation subagents/);
+    assert.match(orchestrator, /loading the Implementation prompt by path/);
+    assert.match(orchestrator, /nothing to close — the task file is the\s+tracker/);
+    assert.match(orchestrator, /closing\s+gate/);
+    assert.match(orchestrator, /request changes re-opens the named\s+tasks/);
+
+    const implement = await read("opencode", "telos-implement");
+    assert.match(implement, /hard-stop naming the blocking tasks/);
+    assert.match(implement, /never re-executed\s+silently/);
+    assert.match(implement, /Record the evidence in the task's TASK\.md\s+body/);
+    assert.match(implement, /verification plan to completion/);
+    assert.match(implement, /tracker's\s+`close_task` op per `\.telos\/tracker\.md`/);
+
+    const copilot = await read("copilot", "telos-orchestrator");
+    assert.match(copilot, /Tasks execute sequentially,\s*not in parallel/);
+
+    assert.match(ref, /evidence \(commands run, results observed\)/);
+    assert.match(ref, /closes the tracker issue\s+via the tracker's `close_task` op/);
+    assert.match(ref, /Feature closing gate/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
 test("codex renders only into .codex/skills, never .agents/skills", async () => {
   const dir = await makeTempRepo();
   try {

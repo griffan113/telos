@@ -50,10 +50,16 @@ at most 10 lines. You then run the approval gate on that artifact:
   feedback and re-present at the same gate. Never advance on an unapproved
   artifact, and never approve on the user's behalf.
 
-After Tasks approval: sync tasks into the tracker, then compute the ready set
-from `depends_on` and fan out parallel Implementation subagents where the
-harness supports it. On each task verification: close its tracker issue and
-rewrite STATE.md.
+After Tasks approval: sync tasks into the tracker, then execute — compute the
+ready set from `depends_on` (a task is ready when every task in its
+`depends_on` is done) and fan out parallel Implementation subagents where the
+harness supports it; on single-context harnesses (Copilot/Codex), emulate
+dispatch by loading the Implementation prompt by path and running ready tasks
+sequentially. Each Implementation agent closes its own task's tracker issue
+on verification (local mode: nothing to close — the task file is the
+tracker); on each task's return, rewrite STATE.md. When every task is done,
+present the verified task table for the feature's closing gate: approve
+completes the feature, request changes re-opens the named tasks.
 
 ## Resume and staleness
 
@@ -63,6 +69,11 @@ comparing each approved artifact's content against its `content_hash`
 artifact and all existing downstream artifacts `status: stale` in their
 frontmatter, then automatically re-run every stale phase in order, through
 their gates.
+
+Discovery cascades: when an Implementation agent reports that an upstream
+artifact got something wrong, treat that artifact as stale, mark it and every
+downstream artifact `status: stale`, and re-run them through their gates in
+order — the discovery report is the revision feedback at each gate.
 
 ## Re-plan sync
 

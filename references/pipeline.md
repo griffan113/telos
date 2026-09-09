@@ -225,7 +225,24 @@ a task is verified. Gate approvals stay local-only, always.
 
 ## Parallel execution
 
-The orchestrator computes the ready set from each task's `depends_on` and
-dispatches Implementation subagents in parallel where the harness supports it.
-Single-context harnesses run tasks sequentially. Every task's verification plan
-is enforced before its issue is closed.
+- **Ready set**: a task is ready when every task in its `depends_on` has
+  `status: done`. The orchestrator computes the ready set after each task
+  completes and dispatches it.
+- **Parallel fan-out** (OpenCode/Claude Code): dispatch one Implementation
+  subagent per ready task, in parallel — ready tasks are independent by
+  construction, so no ordering between them.
+- **Prompt-swap emulation** (Copilot/Codex): single-context harnesses cannot
+  spawn subagents; the orchestrator loads the Implementation prompt by path
+  and executes ready tasks sequentially under the same semantics.
+- **Verification is the gate**: each task runs its TASK.md verification plan
+  to completion; a task without passing verification is never done. The
+  evidence (commands run, results observed) is recorded in the task's
+  TASK.md body, beside its ledger frontmatter.
+- **Close-on-verify**: on verification, the Implementation agent sets
+  `status: done` in TASK.md and the tasks table, and closes the tracker issue
+  via the tracker's `close_task` op (local mode: the task file is the tracker
+  — nothing to close). The orchestrator rewrites STATE.md on each return.
+- **Feature closing gate**: when every task in the table is done, the
+  orchestrator presents the verified task table for the feature's closing
+  approval gate. Approve completes the feature; request changes re-opens
+  named tasks as `in-progress`.
