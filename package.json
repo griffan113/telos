@@ -1,0 +1,21 @@
+{
+  "name": "telos",
+  "version": "0.0.1",
+  "description": "Telos — coding with purpose. Orchestrator-driven spec-driven framework, installed via npx telos init.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "telos": "bin/telos.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "references/"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
