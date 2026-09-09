@@ -46,7 +46,13 @@ the configured artifact language.
 
 ## Sync at approval
 
-Task creation in the tracker happens at Tasks-phase approval:
+Task creation in the tracker happens at Tasks-phase approval. If this is a
+cascade re-approval — issues already exist for this feature — run the Re-plan
+diffing rules in pipeline.md instead of creating duplicates: unchanged tasks
+keep their issues, new tasks get issues, removed tasks are closed with a
+`superseded:` comment, changed tasks are closed superseded and recreated.
+
+First approval sync:
 
 - **local** — the task files and the tasks table ARE the tracker. Create no
   duplicate issue store anywhere; the sync is a no-op.

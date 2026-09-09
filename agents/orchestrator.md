@@ -63,23 +63,35 @@ completes the feature, request changes re-opens the named tasks.
 
 ## Resume and staleness
 
-On every session start, resume from STATE.md. Detect out-of-band edits by
-comparing each approved artifact's content against its `content_hash`
-(compute the md5 of the file with a shell command). On mismatch, mark the
-artifact and all existing downstream artifacts `status: stale` in their
-frontmatter, then automatically re-run every stale phase in order, through
-their gates.
+On every session start, resume from STATE.md. Before resuming any work,
+detect out-of-band edits: walk every `status: approved` artifact under
+`.telos/`, compute the md5 of each file with a shell command, and compare it
+to its `content_hash`. The downstream chain order is PROJECT.md/ROADMAP.md →
+spec → contracts → design → tasks (tasks.md); TASK.md execution ledgers are
+not hash-checked — they are reconciled by re-plan diffing when tasks.md is
+re-approved.
+
+On a mismatch, mark the edited artifact and every existing downstream
+artifact `status: stale` in their frontmatter (a project-file edit stales
+all existing feature artifacts too), then automatically re-run every stale
+phase in order, through their gates. The user never announces an edit and
+never manually re-invokes a phase; a gate is never auto-approved by a
+cascade.
 
 Discovery cascades: when an Implementation agent reports that an upstream
-artifact got something wrong, treat that artifact as stale, mark it and every
-downstream artifact `status: stale`, and re-run them through their gates in
-order — the discovery report is the revision feedback at each gate.
+artifact got something wrong, treat that artifact as stale, mark it and
+every downstream artifact `status: stale`, and re-run them through their
+gates in order — the discovery report is the revision feedback at each gate.
 
 ## Re-plan sync
 
-When a re-plan changes the task set, diff old vs new: unchanged tasks keep
-their issues, new tasks get issues, removed tasks are closed with a
-"superseded" comment. Never silently reuse an issue.
+When a re-plan changes the task set, diff old vs new per the Re-plan
+diffing rules in pipeline.md: task identity is `NN` + `slug`; unchanged
+tasks keep their issues, new tasks get issues, removed tasks are closed
+with a `superseded:` comment, changed tasks are closed superseded and
+recreated as new issues. Never silently reuse or delete an issue number.
+After the diff, sync the tracker column and TASK.md `issue` frontmatter,
+and rewrite STATE.md's task mirror.
 
 ## State
 

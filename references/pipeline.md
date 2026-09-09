@@ -70,11 +70,45 @@ that language. Agent instructions (like this document) stay in English. The
 
 ## Staleness and cascade
 
-- If an approved artifact is edited out of band, the next resume detects a
-  mismatch between its content and `content_hash` and marks it — and every
-  downstream artifact that exists — `status: stale`.
-- The orchestrator then re-runs every stale phase in pipeline order, each
-  through its own gate again. The user never re-invokes phases manually.
+- The chain order is: PROJECT.md/ROADMAP.md → spec → contracts → design →
+  tasks (tasks.md). An artifact's downstream chain is everything after it in
+  that order that exists. TASK.md execution ledgers are not hash-checked —
+  they are reconciled by re-plan diffing when tasks.md is re-approved.
+- Only artifacts with `status: approved` carry a `content_hash` and take part
+  in detection. Drafts are never hash-checked.
+- On every session start (and before resuming any work), the orchestrator
+  recomputes each approved artifact's md5 and compares it to
+  `content_hash`. A mismatch means an out-of-band edit.
+- On a mismatch, the orchestrator marks the edited artifact and every
+  existing downstream artifact `status: stale` in their frontmatter — for a
+  project file, that means all existing feature artifacts too. No manual
+  re-invocation: the user never announces edits.
+- The orchestrator then automatically re-runs every stale phase in pipeline
+  order, each through its own gate again. The user approves or requests
+  changes as usual; a gate is never auto-approved by a cascade.
+- Discovery cascades behave the same: when an Implementation agent reports
+  an upstream artifact got something wrong, that artifact and its downstream
+  chain go stale and re-run through their gates, with the discovery report
+  as revision feedback.
+
+## Re-plan diffing
+
+When the Tasks phase is re-approved during a cascade, diff the old task set
+against the new one. Task identity is `NN` + `slug`:
+
+- **Unchanged** (same identity, same title, same `depends_on`, same
+  `requirements`): the issue stays untouched, in its current state.
+- **New**: a new issue is created.
+- **Removed**: the issue is closed with a comment beginning `superseded:`
+  and a one-line reason.
+- **Changed** (same identity, different content): the old issue is closed
+  with a `superseded:` comment and a new issue is created for it. Issue
+  numbers are never silently reused or deleted; `create_task` never updates
+  an existing issue's blocking edges in place.
+
+After the diff, sync the `tracker` column and each TASK.md's `issue`
+frontmatter with the resulting issue numbers, and rewrite STATE.md's task
+mirror.
 
 ## Dispatch contract
 

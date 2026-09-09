@@ -13,10 +13,10 @@ blocked_by: ["006: Implementation phase + parallel fan-out + close-on-verify"]
 
 **Blocked by:** 006: Implementation phase + parallel fan-out + close-on-verify.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Content-hash mismatch on an approved artifact triggers stale marking of the entire downstream chain
-- [ ] The orchestrator re-runs every downstream phase in order, each through its own gate
-- [ ] The user never needs to announce an edit or manually re-invoke a phase
-- [ ] Task re-plan diffing keeps issues for unchanged tasks, creates for new, closes removed with a superseded comment
-- [ ] Cross-session resume detects edited approved artifacts on session start
+- [x] Content-hash mismatch on an approved artifact triggers stale marking of the entire downstream chain
+- [x] The orchestrator re-runs every downstream phase in order, each through its own gate
+- [x] The user never needs to announce an edit or manually re-invoke a phase
+- [x] Task re-plan diffing keeps issues for unchanged tasks, creates for new, closes removed with a superseded comment
+- [x] Cross-session resume detects edited approved artifacts on session start

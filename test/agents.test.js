@@ -202,6 +202,39 @@ test("rendered execution carries ready sets, close-on-verify, and the closing ga
   }
 });
 
+test("rendered cascade carries hash detection, chains, and re-plan diffing", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const orchestrator = await fs.readFile(
+      path.join(dir, ".opencode", "agent", "telos-orchestrator.md"),
+      "utf8"
+    );
+    const ref = await fs.readFile(
+      path.join(dir, ".telos", "references", "pipeline.md"),
+      "utf8"
+    );
+
+    assert.match(orchestrator, /walk every `status: approved` artifact under/);
+    assert.match(orchestrator, /PROJECT\.md\/ROADMAP\.md →\s*spec → contracts → design → tasks \(tasks\.md\)/);
+    assert.match(orchestrator, /TASK\.md execution ledgers are\s*not hash-checked/);
+    assert.match(orchestrator, /a project-file edit stales\s+all existing feature artifacts too/);
+    assert.match(orchestrator, /never manually re-invokes a phase/);
+    assert.match(orchestrator, /never auto-approved by a\s+cascade/);
+    assert.match(orchestrator, /task identity is `NN` \+ `slug`/);
+    assert.match(orchestrator, /changed tasks are closed superseded and\s+recreated as new issues/);
+
+    assert.match(ref, /Drafts are never hash-checked/);
+    assert.match(ref, /beginning `superseded:`/);
+    assert.match(ref, /never silently reused or deleted/);
+    assert.match(ref, /`create_task` never updates\s+an existing issue's blocking edges in place/);
+    assert.match(ref, /with the discovery report\s+as revision feedback/);
+    assert.match(ref, /reconciled by re-plan diffing when tasks\.md is re-approved/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
 test("codex renders only into .codex/skills, never .agents/skills", async () => {
   const dir = await makeTempRepo();
   try {
