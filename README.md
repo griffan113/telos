@@ -10,12 +10,12 @@ the framework detects it and re-runs everything downstream, automatically.
 Install it into any repo with one command:
 
 ```sh
-npx telos init
+npx use-telos init
 ```
 
 ## Quick start
 
-1. Run `npx telos init` in your repo. The CLI scaffolds `.telos/`, asks which
+1. Run `npx use-telos init` in your repo. The CLI scaffolds `.telos/`, asks which
    AI harness you use (or detects it), which issue tracker you want, and which
    language your artifacts should be written in.
 2. Open your AI harness and say: **start telos**.
@@ -84,7 +84,7 @@ moment a task's verification passes. Gate approvals stay local-only, always.
 ## Updating the framework
 
 ```sh
-npx telos update
+npx use-telos update
 ```
 
 Re-renders generated agent files (they carry a generated marker) and applies
