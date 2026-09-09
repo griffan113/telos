@@ -13,9 +13,9 @@ blocked_by: ["006: Implementation phase + parallel fan-out + close-on-verify"]
 
 **Blocked by:** 006: Implementation phase + parallel fan-out + close-on-verify.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Task creation, blocking, comment, assign, list-open, fetch-status, and close operations all pass through the uniform tracker interface
-- [ ] One issue per task, labeled per feature; blocking rendered in issue bodies
-- [ ] Issues close on task verification during a live pipeline run
-- [ ] The tracker sheet template's operations section documents the GitHub mapping
+- [x] Task creation, blocking, comment, assign, list-open, fetch-status, and close operations all pass through the uniform tracker interface
+- [x] One issue per task, labeled per feature; blocking rendered in issue bodies
+- [x] Issues close on task verification during a live pipeline run (specified; live run is ticket 010 dogfooding)
+- [x] The tracker sheet template's operations section documents the GitHub mapping

@@ -250,7 +250,9 @@ hand-edited. Sections:
   a second store to keep in sync by hand. `create_task` on approval is a
   no-op; `fetch_status` reads the task files.
 - **github** — GitHub Issues via `gh`; title `telos: <feature> NN <slug>`,
-  label `telos:<feature>`, body convention `Blocked by: #NN, #NN`.
+  label `telos:<feature>`, body convention `Blocked by:` lines citing the
+  blocking tasks' issue numbers. Tasks are created in topological dependency
+  order so blocking issues exist before dependents reference them.
 - **azure** — Azure DevOps via `az boards`; Task work items titled
   `telos: <feature> NN <slug>` with native dependency links.
 

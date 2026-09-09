@@ -56,10 +56,14 @@ First approval sync:
 
 - **local** — the task files and the tasks table ARE the tracker. Create no
   duplicate issue store anywhere; the sync is a no-op.
-- **github** — for each task: `gh issue create` titled
-  `telos: <feature> NN <slug>`, label `telos:<feature>`, body with
-  `Blocked by: #NN, #NN` lines from `depends_on`. Record the issue numbers in
-  the tasks table and each TASK.md's `issue` frontmatter.
+- **github** — create one issue per task per the Operations section of the
+  tracker sheet (`.telos/tracker.md`): title `telos: <feature> NN <slug>`,
+  label `telos:<feature>`, body with `Blocked by:` lines mapped from
+  `depends_on` to blocking issues. Create tasks in topological dependency
+  order so blocking issues exist first. Record the issue numbers in the
+  tasks table and each TASK.md's `issue` frontmatter. On a cascade
+  re-approval, the re-plan diff's removed and changed tasks are closed with
+  a `superseded:` comment via the `comment` op.
 - **azure** — for each task: `az boards` Task work item titled
   `telos: <feature> NN <slug>`, native dependency links for `depends_on`.
   Record the work item IDs the same way.

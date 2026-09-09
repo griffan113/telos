@@ -55,15 +55,20 @@ ready set from `depends_on` (a task is ready when every task in its
 `depends_on` is done) and fan out parallel Implementation subagents where the
 harness supports it; on single-context harnesses (Copilot/Codex), emulate
 dispatch by loading the Implementation prompt by path and running ready tasks
-sequentially. Each Implementation agent closes its own task's tracker issue
-on verification (local mode: nothing to close — the task file is the
-tracker); on each task's return, rewrite STATE.md. When every task is done,
-present the verified task table for the feature's closing gate: approve
-completes the feature, request changes re-opens the named tasks.
+sequentially. Assign each task's tracker issue to the executing agent as it
+is dispatched (cloud modes: the `assign` op per `.telos/tracker.md`; local
+mode: nothing to assign). Each Implementation agent closes its own task's
+tracker issue on verification (local mode: nothing to close — the task file
+is the tracker); on each task's return, rewrite STATE.md. When every task is
+done, present the verified task table for the feature's closing gate:
+approve completes the feature, request changes re-opens the named tasks.
 
 ## Resume and staleness
 
 On every session start, resume from STATE.md. Before resuming any work,
+sync task statuses from the tracker (cloud modes: the tracker is
+authoritative — use `fetch_status` / `list_open(feature)` per
+`.telos/tracker.md`; local mode: the task files are the tracker). Then
 detect out-of-band edits: walk every `status: approved` artifact under
 `.telos/`, compute the md5 of each file with a shell command, and compare it
 to its `content_hash`. The downstream chain order is PROJECT.md/ROADMAP.md →
@@ -97,5 +102,6 @@ and rewrite STATE.md's task mirror.
 
 Rewrite `.telos/project/STATE.md` wholesale after every gate approval, task
 status change, or cascade: the phase-status table, the mirrored task table
-(tracker truth in cloud modes, a generated view of the task files in local
-mode), and decisions & blockers. Never hand-edit it between rewrites.
+(cloud modes: generated from `list_open(feature)` plus the tasks table;
+local mode: a generated view of the task files), and decisions & blockers.
+Never hand-edit it between rewrites.

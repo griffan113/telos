@@ -154,7 +154,7 @@ test("rendered planning phases carry sizing, graphs, and local-tracker semantics
     assert.match(tasks, /per-task verification plan/);
     assert.match(tasks, /traced to spec REQ IDs/);
     assert.match(tasks, /Create no\s+duplicate issue store anywhere/);
-    assert.match(tasks, /issue numbers in\s+the tasks table/);
+    assert.match(tasks, /issue numbers in the\s+tasks table/);
 
     assert.match(ref, /\| NN \| slug \| title \| depends_on \| status \| tracker \|/);
     assert.match(ref, /task lifecycle\s*\(`pending \| in-progress \| done`\) rather than the artifact statuses/);
@@ -180,7 +180,7 @@ test("rendered execution carries ready sets, close-on-verify, and the closing ga
     assert.match(orchestrator, /a task is ready when every task in its\s+`depends_on` is done/);
     assert.match(orchestrator, /fan out parallel Implementation subagents/);
     assert.match(orchestrator, /loading the Implementation prompt by path/);
-    assert.match(orchestrator, /nothing to close — the task file is the\s+tracker/);
+    assert.match(orchestrator, /nothing to close — the task file\s+is the tracker/);
     assert.match(orchestrator, /closing\s+gate/);
     assert.match(orchestrator, /request changes re-opens the named\s+tasks/);
 
@@ -230,6 +230,48 @@ test("rendered cascade carries hash detection, chains, and re-plan diffing", asy
     assert.match(ref, /`create_task` never updates\s+an existing issue's blocking edges in place/);
     assert.match(ref, /with the discovery report\s+as revision feedback/);
     assert.match(ref, /reconciled by re-plan diffing when tasks\.md is re-approved/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("github tracker sheet documents the uniform ops as exact gh commands", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await runTelos(["init", "--harness", "opencode", "--tracker", "github"], dir);
+    const sheet = await fs.readFile(path.join(dir, ".telos", "tracker.md"), "utf8");
+
+    assert.match(sheet, /## Operations/);
+    assert.match(sheet, /\*\*create_task\*\*/);
+    assert.match(sheet, /\*\*set_blocked_by\*\*/);
+    assert.match(sheet, /\*\*close_task\*\*/);
+    assert.match(sheet, /\*\*comment\*\*/);
+    assert.match(sheet, /\*\*assign\*\*/);
+    assert.match(sheet, /\*\*list_open\(feature\)\*\*/);
+    assert.match(sheet, /\*\*fetch_status\*\*/);
+    assert.match(sheet, /gh issue create/);
+    assert.match(sheet, /Blocked by: #3, #7/);
+    assert.match(sheet, /gh label create "telos:<feature>"/);
+    assert.match(sheet, /close\s*superseded, create fresh/);
+    assert.match(sheet, /generated from `list_open\(feature\)`/);
+    assert.match(sheet, /topological\s*dependency order/);
+    assert.match(sheet, /issue numbers of the blocking tasks/);
+    assert.match(sheet, /mirrors as done when closed/);
+
+    const orchestrator = await fs.readFile(
+      path.join(dir, ".opencode", "agent", "telos-orchestrator.md"),
+      "utf8"
+    );
+    assert.match(orchestrator, /use `fetch_status` \/ `list_open\(feature\)`/);
+    assert.match(orchestrator, /generated from `list_open\(feature\)` plus the tasks table/);
+    assert.match(orchestrator, /`assign` op per `\.telos\/tracker\.md`/);
+
+    const tasksAgent = await fs.readFile(
+      path.join(dir, ".opencode", "agent", "telos-tasks.md"),
+      "utf8"
+    );
+    assert.match(tasksAgent, /topological dependency\s*order/);
+    assert.match(tasksAgent, /`superseded:` comment via the `comment` op/);
   } finally {
     await removeTemp(dir);
   }
