@@ -9,6 +9,9 @@ blocked_by: ["007: Cascade staleness"]
 
 # 010: Dogfood the pipeline on this repo
 
+**Note (2026-09-09):** dogfooding moved to a separate consumer repo by user
+decision; ticket 011 (publish) proceeds ahead of the live run.
+
 **What to build:** Run a real feature of this framework start-to-finish through Telos's own pipeline using the local tracker — "start telos", spec, contracts, design, tasks, implementation, all gates and (at least once) a cascade re-run. This is the only verification of gate behavior, elicitation quality, and cascade interpretation in live use; findings become fix tickets before anything ships.
 
 **Blocked by:** 007: Cascade staleness.

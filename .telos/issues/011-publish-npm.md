@@ -13,9 +13,9 @@ blocked_by: ["010: Dogfood the pipeline on this repo"]
 
 **Blocked by:** 010: Dogfood the pipeline on this repo.
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] Package published; `npx telos init` works on a clean machine in an empty repo
-- [ ] README covers the pipeline, the five phases and gates, the four harnesses, and the three trackers
-- [ ] The four-harness render outputs are all produced by the published package
-- [ ] TLC's copied root files are superseded and not shipped in the package
+- [x] README covers the pipeline, the five phases and gates, the four harnesses, and the three trackers
+- [x] The four-harness render outputs are all produced by the published package (verified against the packed tarball via `npx file:telos-0.0.1.tgz init --harness opencode,claude-code,copilot,codex` in an empty temp repo: 24 agents across all four native dirs)
+- [x] TLC's copied root files are superseded and not shipped in the package (moved to `prior-art/TLC-README.md` / `prior-art/TLC-SKILL.md`; `files` field excludes `prior-art/`)
