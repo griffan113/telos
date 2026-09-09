@@ -97,8 +97,8 @@ to satisfy a downstream phase.
 |---|---|---|
 | Specification | `.telos/project/PROJECT.md` and `.telos/project/ROADMAP.md`, both `status: approved` | the missing or unapproved project file |
 | Contracts | `.telos/features/<feature>/spec.md` with `status: approved` | spec.md |
-| Design | `contracts.md` approved | contracts.md |
-| Tasks | `design.md` approved | design.md |
+| Design | `spec.md` and `contracts.md`, both `status: approved` | the missing or unapproved file |
+| Tasks | `spec.md`, `contracts.md`, `design.md`, all `status: approved` | the missing or unapproved file |
 | Implementation | `tasks.md` approved and synced | tasks.md |
 
 An upstream artifact in `draft` or `stale` status is also a hard-stop: the
@@ -135,6 +135,58 @@ Prose in the artifact language; the interface definitions themselves stay in
 code syntax. Contracts are keyed to approved requirement IDs — if the spec
 changed, it is re-approved first and Contracts re-runs through its gate.
 
+## Design artifact
+
+`.telos/features/<feature>/design.md`, frontmatter `phase: design`,
+`depends_on: [spec, contracts]`. Records the architecture and component
+decisions the tasks will execute:
+
+- What changes and what stays — anchored in the live code, not abstractions.
+- How the pieces fit: modules, data flow, and boundaries, validating against
+  the pinned contracts (cite the contract they satisfy).
+- Deliberate non-decisions: what is deferred and why.
+
+**Depth is sized to the feature's complexity** — a small feature gets a
+10-line artifact, not an architecture essay. Analyze the actual codebase live
+wherever the design touches it; read the consumer repo's own instruction
+files (AGENTS.md, CLAUDE.md) for conventions.
+
+## Tasks artifacts
+
+`.telos/features/<feature>/tasks.md`, frontmatter `phase: tasks`,
+`depends_on: [design]` — the task table and the index of task folders:
+
+| NN | slug | title | depends_on | status | tracker |
+|----|------|-------|------------|--------|---------|
+| 1 | parse-config | Parse telos config | [] | pending | — |
+| 2 | write-render | Render agent files | [1] | pending | — |
+
+Plus one `.telos/features/<feature>/tasks/NN-slug/TASK.md` per task. TASK.md
+is an execution ledger, not a phase artifact: instead of the artifact
+frontmatter it carries its own ledger frontmatter, with a task lifecycle
+(`pending | in-progress | done`) rather than the artifact statuses:
+
+```yaml
+---
+feature: <feature-slug>
+task: 2
+title: Render agent files
+status: pending              # pending | in-progress | done
+depends_on: [1]              # task NNs that block this one
+issue: 12                    # tracker issue number; omit in local mode
+requirements: [REQ-2, REQ-5] # spec IDs this task serves
+---
+```
+
+The body carries implementation notes and a concrete per-task verification
+plan — how to prove this task done (commands to run, behavior to observe),
+enforced before the task is marked done. Make tasks independently executable
+wherever possible so they can run in parallel; make blocking edges explicit.
+Task granularity: a task is one reviewable, verifiable unit of work.
+
+The `tracker` column is filled at approval sync (issue numbers in cloud
+modes, `—` in local mode).
+
 ## Feature naming
 
 The orchestrator derives the feature slug from the user's description: ASCII,
@@ -159,7 +211,10 @@ hand-edited. Sections:
 `set_blocked_by`, `fetch_status`.
 
 - **local** — the task files themselves are the tracker; no duplicate issue
-  store exists. STATE.md's task mirror is a generated view of the task files.
+  store exists. The tasks table and TASK.md frontmatter are the authoritative
+  task state, and STATE.md's task mirror is a generated view of them — never
+  a second store to keep in sync by hand. `create_task` on approval is a
+  no-op; `fetch_status` reads the task files.
 - **github** — GitHub Issues via `gh`; title `telos: <feature> NN <slug>`,
   label `telos:<feature>`, body convention `Blocked by: #NN, #NN`.
 - **azure** — Azure DevOps via `az boards`; Task work items titled

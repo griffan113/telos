@@ -133,6 +133,38 @@ test("rendered pipeline v1 carries gates, hard-stops, and traceability", async (
   }
 });
 
+test("rendered planning phases carry sizing, graphs, and local-tracker semantics", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const read = (name) =>
+      fs.readFile(path.join(dir, ".opencode", "agent", name), "utf8");
+    const ref = await fs.readFile(
+      path.join(dir, ".telos", "references", "pipeline.md"),
+      "utf8"
+    );
+
+    const design = await read("telos-design.md");
+    assert.match(design, /depends_on: \[spec,\s*contracts\]/);
+    assert.match(design, /not `status: approved`,\s*hard-stop/);
+    assert.match(design, /sized to the feature's complexity/);
+
+    const tasks = await read("telos-tasks.md");
+    assert.match(tasks, /depends_on: \[design\]/);    assert.match(tasks, /not `status: approved`,\s*hard-stop/);
+    assert.match(tasks, /per-task verification plan/);
+    assert.match(tasks, /traced to spec REQ IDs/);
+    assert.match(tasks, /Create no\s+duplicate issue store anywhere/);
+    assert.match(tasks, /issue numbers in\s+the tasks table/);
+
+    assert.match(ref, /\| NN \| slug \| title \| depends_on \| status \| tracker \|/);
+    assert.match(ref, /task lifecycle\s*\(`pending \| in-progress \| done`\) rather than the artifact statuses/);
+    assert.match(ref, /STATE\.md's task mirror is a generated view of them/);
+    assert.match(ref, /`create_task` on approval is a\s+no-op/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
 test("codex renders only into .codex/skills, never .agents/skills", async () => {
   const dir = await makeTempRepo();
   try {

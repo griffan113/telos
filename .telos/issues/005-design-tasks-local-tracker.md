@@ -13,10 +13,10 @@ blocked_by: ["004: Pipeline v1 — start telos + Specification + Contracts"]
 
 **Blocked by:** 004: Pipeline v1 — start telos + Specification + Contracts.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Design artifacts are produced and gate-approved, depth sized to feature complexity
-- [ ] Tasks phase emits the full task set with `depends_on` dependency graph in the tasks table and per-task frontmatter
-- [ ] Tasks approval runs through the same gate mechanics as every other phase
-- [ ] Local tracker mode introduces no separate issue store; task files are the tracker
-- [ ] STATE.md's task mirror is a generated view of the task files in local mode
+- [x] Design artifacts are produced and gate-approved, depth sized to feature complexity
+- [x] Tasks phase emits the full task set with `depends_on` dependency graph in the tasks table and per-task frontmatter
+- [x] Tasks approval runs through the same gate mechanics as every other phase
+- [x] Local tracker mode introduces no separate issue store; task files are the tracker
+- [x] STATE.md's task mirror is a generated view of the task files in local mode
