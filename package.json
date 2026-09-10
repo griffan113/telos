@@ -1,6 +1,6 @@
 {
   "name": "use-telos",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Telos — coding with purpose. Orchestrator-driven spec-driven framework, installed via npx use-telos init.",
   "type": "module",
   "license": "MIT",

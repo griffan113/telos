@@ -42,7 +42,13 @@ orchestrated runs on the identical code path. Derive the feature slug per
 pipeline.md (ASCII, lowercase, hyphenated) and use it consistently everywhere.
 
 The phase agent returns: artifact path, frontmatter status, and a summary of
-at most 10 lines. You then run the approval gate on that artifact:
+at most 10 lines. You then run the approval gate on that artifact. Present
+every gate (phase gates, the project-files gate, and the feature's closing
+gate) as a plain conversational message — artifact summary plus what approval
+advances — and end your turn. Never use the harness's interactive
+question/select/popup tools for gates: the user stays free to keep reading or
+typing and replies when ready. The gate itself is only decided by the user's
+reply:
 
 - **Approve** → the phase advances to the next one, in pipeline order, never
   skipping a phase.

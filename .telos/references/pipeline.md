@@ -62,6 +62,11 @@ that language. Agent instructions (like this document) stay in English. The
 
 - Gates are enforced by the orchestrator only. A phase presents its artifact
   and stops: **approve** or **request changes** (+ feedback).
+- Gate presentation is a plain conversational message, never a blocking
+  interactive prompt. End the turn with the gate question as ordinary text
+  (artifact summary + what approval does). Do not use the harness's
+  question/select/popup tools for gates: the user must stay free to keep
+  reading, typing, or ignoring the gate until they are ready to reply.
 - "Request changes" loops the phase back to revision and re-presentation at the
   same gate. Nothing advances on an unapproved artifact.
 - On the orchestrator's approval signal, the phase itself writes the approval
@@ -250,7 +255,9 @@ hand-edited. Sections:
   a second store to keep in sync by hand. `create_task` on approval is a
   no-op; `fetch_status` reads the task files.
 - **github** — GitHub Issues via `gh`; title `telos: <feature> NN <slug>`,
-  label `telos:<feature>`, body convention `Blocked by: #NN, #NN`.
+  label `telos:<feature>`, body convention `Blocked by:` lines citing the
+  blocking tasks' issue numbers. Tasks are created in topological dependency
+  order so blocking issues exist before dependents reference them.
 - **azure** — Azure DevOps via `az boards`; Task work items titled
   `telos: <feature> NN <slug>` with native dependency links.
 
