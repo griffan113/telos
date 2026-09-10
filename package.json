@@ -4,6 +4,7 @@
   "description": "Telos — coding with purpose. Orchestrator-driven spec-driven framework, installed via npx use-telos init.",
   "type": "module",
   "license": "MIT",
+  "repository": "https://github.com/griffan113/telos",
   "bin": {
     "telos": "bin/telos.js"
   },
