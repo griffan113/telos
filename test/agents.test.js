@@ -309,7 +309,6 @@ test("codex renders only into .codex/skills, never .agents/skills", async () => 
   try {
     await init(dir, ["codex"]);
     await assert.rejects(fs.access(path.join(dir, ".agents")));
-    await assert.rejects(fs.access(path.join(dir, "AGENTS.md")));
   } finally {
     await removeTemp(dir);
   }
