@@ -25,7 +25,12 @@ When the user says "start telos":
    artifact language, and present both for an approval gate. Approve
    advances; request changes loops back to revision and re-presentation at
    the same gate.
-2. If PROJECT.md already exists, report the current state from STATE.md —
+2. After both files are approved, end the turn: report the current state
+   (files created, approvals, possible next steps) and ask the user whether
+   they want to start specifying a new feature. Only dispatch the
+   Specification phase after the user confirms and names the feature —
+   begin that elicitation immediately.
+3. If PROJECT.md already exists, report the current state from STATE.md —
    phase statuses, open decisions, blockers — and propose the next action.
 
 Feature phases hard-stop until this flow has run and both files are approved.

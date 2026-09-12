@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { upsertAgentsMd } from "./agents-md.js";
 import { HARNESS_LABELS } from "./detect.js";
 import { CliError } from "./errors.js";
 import { writeRendered } from "./render.js";
@@ -59,9 +60,11 @@ export async function update() {
   }
 
   const rendered = await writeRendered(cwd, config.harnesses, version);
+  const marked = await upsertAgentsMd(cwd, config.language);
   console.log(`
 Re-rendered agent files for: ${config.harnesses.map((h) => HARNESS_LABELS[h] ?? h).join(", ")}
   overwritten: ${rendered.written.length}
   skipped:     ${rendered.skipped.length} (user-owned, no generated marker)
+  marked:      ${marked.file} (${marked.changed ? "## Telos Framework block reconciled" : "block already current"})
 `);
 }
