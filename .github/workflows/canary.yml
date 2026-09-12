@@ -1,0 +1,28 @@
+name: Canary Release
+
+on:
+  push:
+    branches:
+      - canary
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Compute canary version
+        run: |
+          VERSION=$(node -p "require('./package.json').version.split('-')[0]")
+          npm version --no-git-tag-version "${VERSION}-canary.${{ github.run_number }}"
+      - name: Publish to npm
+        run: npm publish --tag canary
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
