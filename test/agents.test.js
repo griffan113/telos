@@ -342,12 +342,48 @@ test("codex renders only into .codex/skills, never .agents/skills", async () => 
   }
 });
 
-test("init copies the pipeline reference into .telos/references", async () => {
+test("init copies the pipeline and diagnosis references into .telos/references", async () => {
   const dir = await makeTempRepo();
   try {
     await init(dir, ["opencode"]);
     const text = await fs.readFile(path.join(dir, ".telos", "references", "pipeline.md"), "utf8");
     assert.match(text, /five phases/);
+    const diag = await fs.readFile(path.join(dir, ".telos", "references", "diagnosis.md"), "utf8");
+    assert.match(diag, /Build a feedback loop/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("orchestrator carries routing, the diagnosis gate, and the STATE.md diagnosis section", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const text = await fs.readFile(
+      path.join(dir, ".opencode", "agent", "telos-orchestrator.md"),
+      "utf8"
+    );
+    assert.match(text, /## Routing/);
+    assert.match(text, /`diagnose <report>`/);
+    assert.match(text, /exactly one\*\* clarifying question/);
+    assert.match(text, /only\s+`\{bug, report\}`/);
+    assert.match(text, /never hard-stops on missing\s+PROJECT\.md/);
+    assert.match(text, /no issues are\s+created, assigned, or closed for a bug/);
+    assert.match(text, /is the diagnosis\s+gate/);
+    assert.match(text, /no closing gate/);
+    assert.match(text, /zero artifacts/);
+    assert.match(text, /discovery report/);
+    assert.match(text, /decisions &amp; blockers|decisions & blockers/);
+    assert.match(text, /Diagnosis section/);
+    assert.match(text, /`diagnosing → awaiting approval → fixing → fixed`/);
+    assert.match(text, /this section is live\s+state, not\s+history/);
+
+    const ref = await fs.readFile(
+      path.join(dir, ".telos", "references", "pipeline.md"),
+      "utf8"
+    );
+    assert.match(ref, /The one exception is the Diagnosis agent/);
+    assert.match(ref, /seam-absence/);
   } finally {
     await removeTemp(dir);
   }

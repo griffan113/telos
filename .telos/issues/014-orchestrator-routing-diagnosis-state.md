@@ -13,13 +13,15 @@ blocked_by: ["013: Diagnosis agent"]
 
 **Blocked by:** 013: Diagnosis agent.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] A user reporting "X is broken/slow/throwing" is routed to Diagnosis without invoking the feature pipeline; an ambiguous request triggers exactly one clarifying question
-- [ ] The pre-fix gate is presented conversationally (no popups/interactive tools), approve applies the fix, request changes loops at the same gate with the feedback, nothing is ever approved on the user's behalf
-- [ ] No closing gate: after the fix the orchestrator reports verification evidence and marks the bug `fixed`, removing the row
-- [ ] STATE.md's Diagnosis section follows the four-column schema and status lifecycle, is rewritten on every change, and `fixed` rows are gone
-- [ ] Session start resumes open bugs from the Diagnosis section; feature pipeline resume behavior is unchanged
-- [ ] A discovery report in the agent's summary triggers the existing staleness cascade on the named upstream artifact and its downstream chain
-- [ ] Zero tracker operations for bugs in local, github, and azure modes
-- [ ] Diagnosis works on a repo where `start telos` init has never run
+- [x] A user reporting "X is broken/slow/throwing" is routed to Diagnosis without invoking the feature pipeline; an ambiguous request triggers exactly one clarifying question
+- [x] The pre-fix gate is presented conversationally (no popups/interactive tools), approve applies the fix, request changes loops at the same gate with the feedback, nothing is ever approved on the user's behalf
+- [x] No closing gate: after the fix the orchestrator reports verification evidence and marks the bug `fixed`, removing the row
+- [x] STATE.md's Diagnosis section follows the four-column schema and status lifecycle, is rewritten on every change, and `fixed` rows are gone
+- [x] Session start resumes open bugs from the Diagnosis section; feature pipeline resume behavior is unchanged
+- [x] A discovery report in the agent's summary triggers the existing staleness cascade on the named upstream artifact and its downstream chain
+- [x] Zero tracker operations for bugs in local, github, and azure modes
+- [x] Diagnosis works on a repo where `start telos` init has never run
+
+**Verification evidence:** `npm test` — 44/44 passing, including `orchestrator carries routing, the diagnosis gate, and the STATE.md diagnosis section` (rendered OpenCode orchestrator) and the reference-copy assertions for `diagnosis.md` and the Diagnosis dispatch exception in `pipeline.md`.
