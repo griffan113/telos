@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { CliError } from "./cli.js";
+import { upsertAgentsMd } from "./agents-md.js";
 import { HARNESS_IDS, HARNESS_LABELS, TRACKER_IDS, detectHarnesses, detectRemote } from "./detect.js";
 import { version } from "./version.js";
 import { closePrompts, isTTY, promptHarnesses, promptLanguage, promptTracker } from "./prompts.js";
@@ -38,6 +39,7 @@ export async function init(flags) {
     });
 
     const rendered = await writeRendered(cwd, harnesses, version);
+    const marked = await upsertAgentsMd(cwd, language);
 
     console.log(`
 Telos ${version} initialized in .telos/
@@ -45,6 +47,7 @@ Telos ${version} initialized in .telos/
   language:  ${language}
   harnesses: ${harnesses.map((h) => HARNESS_LABELS[h]).join(", ")}
   agents:    ${rendered.written.length} rendered${rendered.skipped.length ? `, ${rendered.skipped.length} skipped (user-owned)` : ""}
+  marked:    ${marked.file}${marked.created ? " (created)" : " (## Telos Framework block)"}
 
 Next: open your AI harness and say: start telos
 `);
