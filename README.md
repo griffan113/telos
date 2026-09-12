@@ -105,6 +105,16 @@ your actual code live and read your repo's own instruction files
 (AGENTS.md/CLAUDE.md) for conventions. Telos maintains zero durable codebase
 docs of its own.
 
+## Releases
+
+Versions are cut by [release-please](https://github.com/googleapis/release-please) from [Conventional Commits](https://www.conventionalcommits.org) — never bump `package.json` manually.
+
+1. Open PRs with Conventional Commits titles (`feat:`, `fix:`, …); a CI check enforces the title, individual commits must follow the same convention (see AGENTS.md).
+2. Merging a PR with a `fix:` (patch) or `feat:` (minor) commit into `main` makes release-please open a Release PR — `chore(main): release X.Y.Z` — that bumps `package.json` and updates `CHANGELOG.md`.
+3. Merging that Release PR creates the `vX.Y.Z` Git tag, the GitHub Release with notes, and publishes `use-telos@X.Y.Z` to npm (requires the `NPM_TOKEN` secret).
+
+Merges containing only `docs:`/`chore:`/`ci:` commits release nothing. `feat!:` or a `BREAKING CHANGE:` footer bumps major.
+
 ## License
 
 MIT
