@@ -34,6 +34,9 @@ test("init scaffolds the full .telos tree and records the config", async () => {
 
     const tracker = await fs.readFile(path.join(dir, ".telos", "tracker.md"), "utf8");
     assert.match(tracker, /Local Markdown/);
+
+    const pipeline = await fs.readFile(path.join(dir, ".telos", "references", "pipeline.md"), "utf8");
+    assert.match(pipeline, /Telos Pipeline Reference/);
   } finally {
     await removeTemp(dir);
   }

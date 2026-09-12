@@ -15,11 +15,11 @@ export async function loadAgents() {
 }
 
 export function parseFrontmatter(text) {
-  const match = text.match(/^---\n([\s\S]*?)\n---\n?/);
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if (!match) return { frontmatter: {}, body: text };
   const frontmatter = {};
   let currentKey = null;
-  for (const line of match[1].split("\n")) {
+  for (const line of match[1].split(/\r?\n/)) {
     const listEntry = line.match(/^\s*-\s+(.*)$/);
     if (listEntry && currentKey) {
       if (!Array.isArray(frontmatter[currentKey])) frontmatter[currentKey] = [];
