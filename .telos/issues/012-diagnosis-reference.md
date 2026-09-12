@@ -13,8 +13,8 @@ blocked_by: []
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The file covers all six internal steps with their completion criteria, redaction rules, non-deterministic-bug guidance (raise reproduction rate, don't chase clean repro), the perf branch, and the "no red-capable command, no Phase 2" stop rule
-- [ ] Written harness-neutral: no skill invocation, no harness-specific tool names required to follow it
-- [ ] The file lands in `.telos/references/` on `init` via the existing reference-copy mechanism, verified by running `init` and checking the copied tree
+- [x] The file covers all six internal steps with their completion criteria, redaction rules, non-deterministic-bug guidance (raise reproduction rate, don't chase clean repro), the perf branch, and the "no red-capable command, no Phase 2" stop rule
+- [x] Written harness-neutral: no skill invocation, no harness-specific tool names required to follow it
+- [x] The file lands in `.telos/references/` on `init` via the existing reference-copy mechanism, verified by running `init` and checking the copied tree
