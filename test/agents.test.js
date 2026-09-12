@@ -17,6 +17,7 @@ const AGENT_NAMES = [
   "telos-design",
   "telos-tasks",
   "telos-implement",
+  "telos-diagnosis",
 ];
 
 const HARNESS_PATHS = {
@@ -38,7 +39,7 @@ function escapeRegExp(string) {
 
 const MARKER_RE = new RegExp(escapeRegExp(MARKER));
 
-test("init renders all six agents with the generated marker, for every harness", async () => {
+test("init renders all seven agents with the generated marker, for every harness", async () => {
   for (const harness of Object.keys(HARNESS_PATHS)) {
     const dir = await makeTempRepo();
     try {
@@ -128,6 +129,33 @@ test("rendered pipeline v1 carries gates, hard-stops, and traceability", async (
     assert.match(ref, /never renumbered once/);
     assert.match(ref, /recorded by the phase at gate approval/);
     assert.match(ref, /never\s+hand-edited/);
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
+test("diagnosis agent carries its contract and required reference", async () => {
+  const dir = await makeTempRepo();
+  try {
+    await init(dir, ["opencode"]);
+    const body = await fs.readFile(
+      path.join(dir, ".opencode", "agent", "telos-diagnosis.md"),
+      "utf8"
+    );
+    assert.match(body, /mode: subagent/);
+    assert.match(body, /## Required references/);
+    assert.match(body, /\.telos\/references\/diagnosis\.md/);
+    assert.match(body, /only `\{bug, report\}`/);
+    assert.match(body, /zero artifacts/);
+    assert.match(body, /fallback: English/);
+    assert.match(body, /\[DEBUG-/);
+    assert.match(body, /Do not apply the fix without/);
+    assert.match(body, /discovery report/);
+    assert.match(body, /seam-absence/);
+    assert.match(
+      body,
+      /nothing is ever written under\s+`\.telos\/` for a bug/
+    );
   } finally {
     await removeTemp(dir);
   }

@@ -13,10 +13,12 @@ blocked_by: ["012: Diagnosis discipline reference"]
 
 **Blocked by:** 012: Diagnosis discipline reference.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] The agent renders on OpenCode, Claude Code, Copilot, and Codex from the single neutral source, as a subagent-equivalent on each, with its required reference injected into the body
-- [ ] Dispatch contract is `{bug, report}` only; the agent never asks the orchestrator to inline code, artifacts, or other context
-- [ ] Language: conversational replies in the telos.json language, English fallback when telos.json is absent; instructions stay in English
-- [ ] No artifacts written under `.telos/` at any point of the run; regression tests land in the codebase at the correct seam, or the seam-absence finding is returned in the summary
-- [ ] The summary returned to the orchestrator is ≤10 lines and contains symptoms + winning hypothesis + planned fix, plus discovery report and seam finding when applicable
+- [x] The agent renders on OpenCode, Claude Code, Copilot, and Codex from the single neutral source, as a subagent-equivalent on each, with its required reference injected into the body
+- [x] Dispatch contract is `{bug, report}` only; the agent never asks the orchestrator to inline code, artifacts, or other context
+- [x] Language: conversational replies in the telos.json language, English fallback when telos.json is absent; instructions stay in English
+- [x] No artifacts written under `.telos/` at any point of the run; regression tests land in the codebase at the correct seam, or the seam-absence finding is returned in the summary
+- [x] The summary returned to the orchestrator is ≤10 lines and contains symptoms + winning hypothesis + planned fix, plus discovery report and seam finding when applicable
+
+**Verification evidence:** `npm test` — 43/43 passing, including the new `renders all seven agents` (all 4 harness paths) and `diagnosis agent carries its contract and required reference` tests.
