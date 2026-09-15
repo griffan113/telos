@@ -128,6 +128,10 @@ mirror.
   the reference docs listed in its frontmatter. Never inline upstream
   artifacts or other context in the dispatch message — the only conversational
   addition is the user's revision feedback on a re-present.
+- The one exception is the Diagnosis agent, dispatched with only `{bug,
+  report}` — a bug slug (same slug rules) plus the user's literal bug report.
+  Diagnosis runs outside the pipeline with the same zero-artifact rule; its
+  detail lives in its agent prompt.
 - Return value: the artifact path, its frontmatter status, and a summary of at
   most 10 lines.
 
@@ -246,7 +250,12 @@ hand-edited. Sections:
 - **Phase status table** — one row per feature and phase, local truth.
 - **Mirrored task table** — tracker truth for cloud modes (github/azure); a
   generated view of the task files for the local tracker.
-- **Decisions & blockers** — recorded during gates and execution.
+- **Diagnosis section** — one row per bug: `| bug | symptom | status |
+  confirmed hypothesis |`, statuses `diagnosing → awaiting approval → fixing
+  → fixed`. Bugs are fixed and their rows removed; the section is live state,
+  not history. A diagnosis produces no artifacts under `.telos/`.
+- **Decisions & blockers** — recorded during gates and execution; this is
+  where a diagnosis's seam-absence finding lands.
 
 ## Tracker
 
