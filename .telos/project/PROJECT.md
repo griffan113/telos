@@ -2,7 +2,7 @@
 phase: project
 status: approved
 approved_at: 2026-09-12T14:36:44Z
-content_hash: 263c236737cb7e8a41c8a90d4b27ef6f
+content_hash: ae11811c708d1cdd825e658f93602053
 depends_on: []
 ---
 

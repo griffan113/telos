@@ -2,7 +2,7 @@
 phase: roadmap
 status: approved
 approved_at: 2026-09-12T14:36:44Z
-content_hash: be1c8da8dbfeedc83218cd7797007447
+content_hash: db7ba2bbe86250a269abca060cd4b1d9
 depends_on: []
 ---
 
