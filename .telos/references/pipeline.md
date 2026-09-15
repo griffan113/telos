@@ -16,7 +16,12 @@ Before any feature work exists, the orchestrator runs the "start telos" flow:
    detail. All prose in the configured artifact language.
 3. Present both for an approval gate. Revise and re-present on request
    changes; nothing proceeds unapproved.
-4. Feature phases hard-stop until this has run. If PROJECT.md or ROADMAP.md
+4. After both files are approved, the orchestrator ends its turn: it reports
+   the current state (files created, approvals, possible next steps) and asks
+   the user whether they want to start specifying a new feature. The
+   Specification phase is dispatched only after the user confirms and names
+   the feature — elicitation never starts uninvited.
+5. Feature phases hard-stop until this has run. If PROJECT.md or ROADMAP.md
    is missing, the message is exactly: `Run 'start telos' first — PROJECT.md
    does not exist.` (name the missing file).
 

@@ -19,6 +19,7 @@
     "node": ">=18.17"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "telos": "node bin/telos.js"
   }
 }

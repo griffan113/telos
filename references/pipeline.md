@@ -16,7 +16,12 @@ Before any feature work exists, the orchestrator runs the "start telos" flow:
    detail. All prose in the configured artifact language.
 3. Present both for an approval gate. Revise and re-present on request
    changes; nothing proceeds unapproved.
-4. Feature phases hard-stop until this has run. If PROJECT.md or ROADMAP.md
+4. After both files are approved, the orchestrator ends its turn: it reports
+   the current state (files created, approvals, possible next steps) and asks
+   the user whether they want to start specifying a new feature. The
+   Specification phase is dispatched only after the user confirms and names
+   the feature — elicitation never starts uninvited.
+5. Feature phases hard-stop until this has run. If PROJECT.md or ROADMAP.md
    is missing, the message is exactly: `Run 'start telos' first — PROJECT.md
    does not exist.` (name the missing file).
 
@@ -123,6 +128,10 @@ mirror.
   the reference docs listed in its frontmatter. Never inline upstream
   artifacts or other context in the dispatch message — the only conversational
   addition is the user's revision feedback on a re-present.
+- The one exception is the Diagnosis agent, dispatched with only `{bug,
+  report}` — a bug slug (same slug rules) plus the user's literal bug report.
+  Diagnosis runs outside the pipeline with the same zero-artifact rule; its
+  detail lives in its agent prompt.
 - Return value: the artifact path, its frontmatter status, and a summary of at
   most 10 lines.
 
@@ -241,7 +250,12 @@ hand-edited. Sections:
 - **Phase status table** — one row per feature and phase, local truth.
 - **Mirrored task table** — tracker truth for cloud modes (github/azure); a
   generated view of the task files for the local tracker.
-- **Decisions & blockers** — recorded during gates and execution.
+- **Diagnosis section** — one row per bug: `| bug | symptom | status |
+  confirmed hypothesis |`, statuses `diagnosing → awaiting approval → fixing
+  → fixed`. Bugs are fixed and their rows removed; the section is live state,
+  not history. A diagnosis produces no artifacts under `.telos/`.
+- **Decisions & blockers** — recorded during gates and execution; this is
+  where a diagnosis's seam-absence finding lands.
 
 ## Tracker
 
