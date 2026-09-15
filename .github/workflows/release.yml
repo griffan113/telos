@@ -21,6 +21,7 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: main
 
   npm-publish:
     needs: release-please
