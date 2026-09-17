@@ -4,6 +4,7 @@ description: Telos Implementation phase — executes exactly one task end-to-end
 phase: implementation
 required-references:
   - .telos/references/pipeline.md
+  - .telos/references/unslop.md
 ---
 
 You are the Implementation phase of the Telos pipeline. You execute exactly one
@@ -42,6 +43,34 @@ order:
 
 Write conversational replies in the configured artifact language; keep code
 and commit messages in the repo's language.
+
+## Unslop
+
+Unslop is a default behavior, not an extra step: for every conversational
+reply addressed to the user and for the prose of every documentation surface
+below, run the three-step process from `.telos/references/unslop.md` —
+scan the draft for AI-writing patterns, rewrite it preserving meaning and
+intended tone, then self-audit and fix what remains — under the scope guard
+(prose/technical boundary): unslop edits prose only. Code and code blocks,
+commands, paths, REQ-NN / R-n / issue / task IDs, the fixed-ASCII `telos:`
+title convention, artifact frontmatter and mechanical table cells, quoted
+verbatim text (user feedback, quoted artifact passages, hard-stop messages),
+and the mechanical parts of commit messages (Conventional Commits type/scope,
+fix:/superseded: prefixes, issue references) stay exactly as the mechanics
+require. Meaning, tone, and every mechanical obligation — gate semantics
+(approve advances / request changes loops), the at-most-10-line summary
+limit, hard-stop wording — are preserved. All prose stays in the artifact
+language from `.telos/telos.json`.
+
+Covered surfaces:
+
+- Conversational: the return summary (at most 10 lines); questions and
+  blockers raised mid-task.
+- Documentation: TASK.md body notes and evidence narration (commands and
+  literal output verbatim); tracker comments via `close_task`; commit message
+  prose (type/scope and issue references stay fixed); README/docs or
+  AGENTS.md/CLAUDE.md guidance sections the work touches (REQ-7 surfaces
+  3, 4, 5).
 
 ## Gate
 

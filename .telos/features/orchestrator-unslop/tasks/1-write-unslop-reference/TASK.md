@@ -2,7 +2,7 @@
 feature: orchestrator-unslop
 task: 1
 title: Author references/unslop.md and land the in-repo copies
-status: pending
+status: done
 issue: 23
 depends_on: []
 requirements: [REQ-1, REQ-3, REQ-4, REQ-7]
@@ -78,3 +78,39 @@ surface).
 7. `git diff --stat` shows only `references/unslop.md` (new) plus the
    derived copies outside the diff surface — no `src/` or `adapters/`
    changes.
+
+## Evidence
+
+Distilled the source skill from
+`https://raw.githubusercontent.com/cursor/plugins/main/pstack/skills/unslop/SKILL.md`
+(fetched live; 6093 bytes). Created `references/unslop.md` with the six
+sections of C-1/D-1: purpose, Process (scan / rewrite / self-audit),
+Patterns (full port, one line per rule), Language (any-language statement
+plus the Portuguese example set), Coverage (the five surfaces), and Scope
+guard (C-5 text). Ran the D-3 copy step, then the verification plan:
+
+1. `grep -c 'R-[0-9]' references/unslop.md` → `30`. Catalogue entries
+   extracted with `grep -oE '^- R-[0-9]+\.'`:
+   `-3 -5 -7 -8 -9 -10 -11 -12 -13 -14 -15 -16 -17 -18 -19 -20 -22 -23 -24
+   -25 -26 -27 -28 -29 -30 -31 -32 -33` — full port, gaps at 1, 2, 4, 6, 21
+   preserved.
+2. `grep -E 'scan|rewrite|self-audit' references/unslop.md` → matches:
+   `only in English. Scan, rewrite, and self-audit a reply or a document in
+   its` and `documentation. It never rewrites technical content, which stays
+   exactly as` (the three steps are in `## Process`).
+3. `grep -E 'Espero que isso ajude|É importante notar que|não apenas'
+   references/unslop.md` → all three Portuguese examples found.
+4. Coverage list present: `grep -cE 'PROJECT\.md|TASK\.md|tracker|AGENTS\.md'`
+   → `5`; unique matches: `AGENTS.md`, `PROJECT.md`, `TASK.md`, `tracker`.
+5. Scope guard present: `grep -nE 'Scope guard|never rewrites technical
+   content|prose of what agents write'` → lines 144-147.
+6. `cp references/unslop.md references/diagnosis.md .telos/references/` ran;
+   `.telos/references/unslop.md` and `.telos/references/diagnosis.md` both
+   exist, and `diff` against the shipped sources reports no differences for
+   either.
+7. `git status --porcelain` and `git diff --stat`: this task's additions are
+   `references/unslop.md` (new) and the derived `.telos/references/unslop.md`
+   and `.telos/references/diagnosis.md` copies. No `src/` or `adapters/`
+   changes; the other modified files (agents, tests, task 2's TASK.md) are
+   sibling tasks' work, untouched by this task.
+

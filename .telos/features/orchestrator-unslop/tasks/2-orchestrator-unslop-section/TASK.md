@@ -2,7 +2,7 @@
 feature: orchestrator-unslop
 task: 2
 title: Add the unslop section to agents/orchestrator.md
-status: pending
+status: done
 issue: 24
 depends_on: []
 requirements: [REQ-2, REQ-3, REQ-6]
@@ -56,3 +56,24 @@ constraint).
    it and the routing logic is unchanged.
 4. `git diff agents/orchestrator.md` — only the frontmatter line and the
    new section added; no gate/dispatch/tracker wording touched.
+
+## Evidence
+
+Commands run and observed results:
+
+1. `grep -n 'unslop.md' agents/orchestrator.md` — found at line 7 inside the
+   `required-references` block (`  - .telos/references/unslop.md`, directly
+   after the pipeline.md entry) and at line 25 in the new section body.
+2. `grep -nE 'scan|rewrite|self-audit' agents/orchestrator.md` — the
+   three-step process named at lines 26–27 ("scan the draft for the known
+   AI-writing patterns, rewrite preserving meaning and intended tone, then
+   self-audit"); remaining matches (lines 151, 189, 198) are pre-existing
+   STATE.md rewrite wording, untouched.
+3. `grep -n '## Routing' agents/orchestrator.md` — `## Routing` at line 51;
+   the new `## Unslop` section sits immediately before it and the routing
+   logic is unchanged.
+4. `git diff agents/orchestrator.md` — exactly two hunks: the added
+   frontmatter line and the added `## Unslop` section (lines 18–50). No
+   gate, dispatch, or tracker wording touched.
+
+No commit made; test suite not run (task 4 owns it).

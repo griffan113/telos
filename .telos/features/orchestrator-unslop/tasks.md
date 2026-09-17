@@ -2,7 +2,7 @@
 phase: tasks
 status: approved
 approved_at: 2026-09-17T01:36:17Z
-content_hash: 0cafb072a670583f05d1837055564a5b
+content_hash: 662fa00e6cc917203657b395ccce413e
 depends_on: [design]
 ---
 
@@ -15,10 +15,10 @@ output.
 
 | NN | slug | title | depends_on | status | tracker |
 |----|------|-------|------------|--------|---------|
-| 1 | write-unslop-reference | Author references/unslop.md and land the in-repo copies | [] | pending | #23 |
-| 2 | orchestrator-unslop-section | Add the unslop section to agents/orchestrator.md | [] | pending | #24 |
-| 3 | six-agents-unslop-section | Add the unslop section to the six remaining agent sources | [] | pending | #25 |
-| 4 | tests-and-rerender | Extend the test suite, run it, and re-render this repo | [1, 2, 3] | pending | #26 |
+| 1 | write-unslop-reference | Author references/unslop.md and land the in-repo copies | [] | done | #23 |
+| 2 | orchestrator-unslop-section | Add the unslop section to agents/orchestrator.md | [] | done | #24 |
+| 3 | six-agents-unslop-section | Add the unslop section to the six remaining agent sources | [] | done | #25 |
+| 4 | tests-and-rerender | Extend the test suite, run it, and re-render this repo | [1, 2, 3] | done | #26 |
 
 ## Task folders
 

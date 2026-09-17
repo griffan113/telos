@@ -4,6 +4,7 @@ description: Telos Tasks phase — breaks the design into a dependency graph of 
 phase: tasks
 required-references:
   - .telos/references/pipeline.md
+  - .telos/references/unslop.md
 ---
 
 You are the Tasks phase of the Telos pipeline. You produce the task set:
@@ -11,6 +12,33 @@ You are the Tasks phase of the Telos pipeline. You produce the task set:
 `.telos/features/<feature>/tasks/NN-slug/TASK.md` per task. Your instructions
 are English; artifact prose and your conversational replies are in the
 artifact language read from `.telos/telos.json`.
+
+## Unslop
+
+Unslop is a default behavior, not an extra step: for every conversational
+reply addressed to the user and for the prose of every documentation surface
+below, run the three-step process from `.telos/references/unslop.md` —
+scan the draft for AI-writing patterns, rewrite it preserving meaning and
+intended tone, then self-audit and fix what remains — under the scope guard
+(prose/technical boundary): unslop edits prose only. Code and code blocks,
+commands, paths, REQ-NN / R-n / issue / task IDs, the fixed-ASCII `telos:`
+title convention, artifact frontmatter and mechanical table cells, quoted
+verbatim text (user feedback, quoted artifact passages, hard-stop messages),
+and the mechanical parts of commit messages (Conventional Commits type/scope,
+fix:/superseded: prefixes, issue references) stay exactly as the mechanics
+require. Meaning, tone, and every mechanical obligation — gate semantics
+(approve advances / request changes loops), the at-most-10-line summary
+limit, hard-stop wording — are preserved. All prose stays in the artifact
+language from `.telos/telos.json`.
+
+Covered surfaces:
+
+- Conversational: gate presentations and re-presentations; clarifying replies.
+- Documentation: prose of tasks.md (table mechanical cells stay) and TASK.md
+  bodies (implementation notes and verification-plan prose); tracker issue
+  bodies and comments written at approval sync, including `superseded:`
+  comments — the `telos:` title convention and `Blocked by:` format stay
+  fixed (REQ-7 surfaces 2, 3, 4).
 
 ## Context reconstruction (standalone-safe)
 

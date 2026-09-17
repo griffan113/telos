@@ -2,7 +2,7 @@
 feature: orchestrator-unslop
 task: 4
 title: Extend the test suite, run it, and re-render this repo
-status: pending
+status: done
 issue: 26
 depends_on: [1, 2, 3]
 requirements: [REQ-1, REQ-4, REQ-5, REQ-6]
@@ -52,3 +52,24 @@ this task's diff beyond the upstream tasks' files — no `src/` or
 4. `git diff --stat` against the feature base shows exactly: new
    `references/unslop.md`, seven `agents/*.md` modified, test files
    modified — and nothing under `src/` or `adapters/` (C-5).
+
+## Evidence
+
+1. `npm test` — 45 tests, 45 pass, 0 fail (includes the new unslop assertions
+   in test/init.test.js and test/agents.test.js).
+2. `node bin/telos.js update` — exit 0; 7 opencode renders overwritten;
+   every `.opencode/agent/telos-*.md` carries the `telos:generated` marker,
+   `- .telos/references/unslop.md` under `## Required references`, and a
+   `## Unslop` section naming the three-step process.
+3. `.telos/references/unslop.md` and `.telos/references/diagnosis.md` exist
+   in this repo (task 1); every rendered agent's required reference resolves.
+4. `git diff --stat` shows exactly: `references/unslop.md` (new), the seven
+   `agents/*.md`, `test/init.test.js`, `test/agents.test.js` — and nothing
+   under `src/` or `adapters/` (C-5 verified).
+
+One refinement before this task verified: the preamble sentence in
+`references/unslop.md` claimed inherited gaps at R-1, R-2, R-4, R-6, and
+R-21. Checking the live source showed R-1 and R-2 name the source's process
+steps, so only R-4, R-6, and R-21 are catalogue gaps; the sentence was
+corrected and the in-repo copy re-synced. The catalogue itself was already a
+verbatim full port.

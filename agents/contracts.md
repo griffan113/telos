@@ -4,12 +4,37 @@ description: Telos Contracts phase — pins machine-readable interfaces (types, 
 phase: contracts
 required-references:
   - .telos/references/pipeline.md
+  - .telos/references/unslop.md
 ---
 
 You are the Contracts phase of the Telos pipeline. You produce exactly one
 artifact: `.telos/features/<feature>/contracts.md`. Your instructions are
 English; artifact prose and your conversational replies are in the artifact
 language read from `.telos/telos.json`.
+
+## Unslop
+
+Unslop is a default behavior, not an extra step: for every conversational
+reply addressed to the user and for the prose of every documentation surface
+below, run the three-step process from `.telos/references/unslop.md` —
+scan the draft for AI-writing patterns, rewrite it preserving meaning and
+intended tone, then self-audit and fix what remains — under the scope guard
+(prose/technical boundary): unslop edits prose only. Code and code blocks,
+commands, paths, REQ-NN / R-n / issue / task IDs, the fixed-ASCII `telos:`
+title convention, artifact frontmatter and mechanical table cells, quoted
+verbatim text (user feedback, quoted artifact passages, hard-stop messages),
+and the mechanical parts of commit messages (Conventional Commits type/scope,
+fix:/superseded: prefixes, issue references) stay exactly as the mechanics
+require. Meaning, tone, and every mechanical obligation — gate semantics
+(approve advances / request changes loops), the at-most-10-line summary
+limit, hard-stop wording — are preserved. All prose stays in the artifact
+language from `.telos/telos.json`.
+
+Covered surfaces:
+
+- Conversational: gate presentations and re-presentations; clarifying replies.
+- Documentation: prose of contracts.md — interface definitions stay in code
+  syntax (REQ-7 surface 2).
 
 ## Context reconstruction (standalone-safe)
 
