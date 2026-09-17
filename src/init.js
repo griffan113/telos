@@ -2,7 +2,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { CliError } from "./cli.js";
 import { upsertAgentsMd } from "./agents-md.js";
-import { HARNESS_IDS, HARNESS_LABELS, TRACKER_IDS, detectHarnesses, detectRemote } from "./detect.js";
+import {
+  HARNESS_IDS,
+  HARNESS_LABELS,
+  detectHarnesses,
+  detectRemote,
+  validatedHarnesses,
+  validatedLanguage,
+  validatedTracker,
+} from "./detect.js";
 import { version } from "./version.js";
 import { closePrompts, isTTY, promptHarnesses, promptLanguage, promptTracker } from "./prompts.js";
 import { writeRendered } from "./render.js";
@@ -58,12 +66,7 @@ Next: open your AI harness and say: start telos
 
 async function resolveHarnesses(cwd, flags) {
   if (flags.harness?.length) {
-    for (const id of flags.harness) {
-      if (!HARNESS_IDS.includes(id)) {
-        throw new CliError(`unknown harness: ${id}\nValid: ${HARNESS_IDS.join(", ")}`);
-      }
-    }
-    return [...new Set(flags.harness)];
+    return validatedHarnesses(flags.harness);
   }
 
   const detected = detectHarnesses(cwd);
@@ -87,10 +90,7 @@ async function resolveHarnesses(cwd, flags) {
 
 async function resolveTracker(cwd, flags) {
   if (flags.tracker) {
-    if (!TRACKER_IDS.includes(flags.tracker)) {
-      throw new CliError(`unknown tracker: ${flags.tracker}\nValid: ${TRACKER_IDS.join(", ")}`);
-    }
-    return flags.tracker;
+    return validatedTracker(flags.tracker);
   }
   if (isTTY()) {
     return promptTracker(detectRemote(cwd) ?? "local");
@@ -100,9 +100,7 @@ async function resolveTracker(cwd, flags) {
 
 async function resolveLanguage(flags) {
   if (flags.lang !== undefined) {
-    const lang = flags.lang.trim();
-    if (!lang) throw new CliError("--lang needs a non-empty value");
-    return lang;
+    return validatedLanguage(flags.lang);
   }
   if (isTTY()) {
     return promptLanguage();

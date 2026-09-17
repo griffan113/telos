@@ -17,6 +17,11 @@ init flags (all optional; interactive prompts fill the rest):
   --harness <id[,id...]>           Target harness(es); overrides detection
                                    Valid: opencode, claude-code, copilot, codex
 
+update flags (all optional; apply the given options to telos.json, then re-render):
+  --harness <id[,id...]>           Replace the configured harness(es)
+  --tracker <local|github|azure>   Replace the configured tracker
+  --lang <language>                Replace the artifact language
+
 After init, open your AI harness and say: start telos
 `;
 
