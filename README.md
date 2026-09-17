@@ -92,6 +92,18 @@ additive schema migrations with a printed changelog. Files you have
 hand-modified are warned about and skipped, never overwritten. Your artifacts
 under `.telos/` are never rewritten.
 
+You can also change the stored options in the same run — the values are
+written back to `.telos/telos.json` before re-rendering:
+
+```sh
+npx use-telos update --harness claude-code,codex
+npx use-telos update --tracker github
+npx use-telos update --lang "Português (BR)"
+```
+
+Flag values are validated exactly like `init`; passing an option that already
+holds the given value changes nothing.
+
 ## Language
 
 Init asks for the artifact language (free text, default English). It governs

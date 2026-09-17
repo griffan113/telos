@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { upsertAgentsMd } from "./agents-md.js";
-import { HARNESS_LABELS } from "./detect.js";
+import { HARNESS_IDS, HARNESS_LABELS, TRACKER_IDS } from "./detect.js";
 import { CliError } from "./errors.js";
 import { writeRendered } from "./render.js";
 import { version } from "./version.js";
@@ -12,7 +12,7 @@ const ADDITIVE_DEFAULTS = {
   harnesses: [],
 };
 
-export async function update() {
+export async function update(flags = {}) {
   const cwd = process.cwd();
   const configPath = path.join(cwd, ".telos", "telos.json");
 
@@ -36,6 +36,43 @@ export async function update() {
   }
 
   const changelog = [];
+
+  // Flag overrides are validated before anything is touched so bad input
+  // never leaves a half-updated telos.json behind.
+  if (flags.harness?.length) {
+    for (const id of flags.harness) {
+      if (!HARNESS_IDS.includes(id)) {
+        throw new CliError(`unknown harness: ${id}\nValid: ${HARNESS_IDS.join(", ")}`);
+      }
+    }
+    const next = [...new Set(flags.harness)];
+    if (!arrayEquals(next, config.harnesses)) {
+      changelog.push(
+        `telos.json: harnesses [${formatList(config.harnesses)}] → [${formatList(next)}]`
+      );
+    }
+    config.harnesses = next;
+  }
+  if (flags.tracker !== undefined) {
+    if (!TRACKER_IDS.includes(flags.tracker)) {
+      throw new CliError(
+        `unknown tracker: ${flags.tracker}\nValid: ${TRACKER_IDS.join(", ")}`
+      );
+    }
+    if (config.tracker !== flags.tracker) {
+      changelog.push(`telos.json: tracker ${config.tracker ?? "(none)"} → ${flags.tracker}`);
+      config.tracker = flags.tracker;
+    }
+  }
+  if (flags.lang !== undefined) {
+    const lang = flags.lang.trim();
+    if (!lang) throw new CliError("--lang needs a non-empty value");
+    if (config.language !== lang) {
+      changelog.push(`telos.json: language ${config.language ?? "(none)"} → ${lang}`);
+      config.language = lang;
+    }
+  }
+
   for (const [key, fallback] of Object.entries(ADDITIVE_DEFAULTS)) {
     if (!(key in config)) {
       config[key] = fallback;
@@ -48,10 +85,10 @@ export async function update() {
   }
   if (changelog.length > 0) {
     await fs.writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
-    console.log("Additive migrations applied:");
+    console.log("Applied changes:");
     for (const line of changelog) console.log(`  - ${line}`);
   } else {
-    console.log("No migrations needed.");
+    console.log("No changes needed.");
   }
 
   if (!Array.isArray(config.harnesses) || config.harnesses.length === 0) {
@@ -67,4 +104,13 @@ Re-rendered agent files for: ${config.harnesses.map((h) => HARNESS_LABELS[h] ?? 
   skipped:     ${rendered.skipped.length} (user-owned, no generated marker)
   marked:      ${marked.file} (${marked.changed ? "## Telos Framework block reconciled" : "block already current"})
 `);
+}
+
+function formatList(ids) {
+  const labels = (ids ?? []).map((h) => HARNESS_LABELS[h] ?? h);
+  return labels.length > 0 ? labels.join(", ") : "(none)";
+}
+
+function arrayEquals(a, b) {
+  return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((v, i) => v === b[i]);
 }

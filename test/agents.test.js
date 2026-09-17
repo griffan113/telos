@@ -462,7 +462,7 @@ test("update migrates telos.json additively and prints the changelog", async () 
 
     const result = await runTelos(["update"], dir);
     assert.equal(result.code, 0, `${result.out}\n${result.err}`);
-    assert.match(result.out, /Additive migrations applied/);
+    assert.match(result.out, /Applied changes/);
     assert.match(result.out, /added missing key "language"/);
 
     const migrated = JSON.parse(await fs.readFile(configPath, "utf8"));
