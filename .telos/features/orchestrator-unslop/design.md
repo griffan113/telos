@@ -1,6 +1,8 @@
 ---
 phase: design
-status: draft
+status: approved
+approved_at: 2026-09-17T01:29:56Z
+content_hash: ca970c983e21f9042990687816b0c9cf
 depends_on: [spec, contracts]
 ---
 
