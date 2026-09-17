@@ -49,6 +49,14 @@ test("init renders all seven agents with the generated marker, for every harness
         const text = await fs.readFile(path.join(dir, relPath), "utf8");
         assert.match(text, MARKER_RE, `${relPath} lacks the marker`);
         assert.match(text, /You are (the|a)/, `${relPath} has no prompt body`);
+        assert.match(text, /## Required references/, `${relPath} lacks the references block`);
+        assert.match(
+          text,
+          /- \.telos\/references\/unslop\.md/,
+          `${relPath} does not require the unslop reference`
+        );
+        assert.match(text, /scan/i, `${relPath} lacks the unslop scan step`);
+        assert.match(text, /self-audit/i, `${relPath} lacks the unslop self-audit step`);
       }
     } finally {
       await removeTemp(dir);

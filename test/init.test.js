@@ -42,6 +42,36 @@ test("init scaffolds the full .telos tree and records the config", async () => {
   }
 });
 
+test("init copies the unslop reference with the three steps, rule IDs, PT examples, coverage, and scope guard", async () => {
+  const dir = await makeTempRepo();
+  try {
+    const result = await runTelos(
+      ["init", "--tracker", "local", "--lang", "English", "--harness", "opencode"],
+      dir
+    );
+    assert.equal(result.code, 0, `${result.out}\n${result.err}`);
+
+    const unslop = await fs.readFile(path.join(dir, ".telos", "references", "unslop.md"), "utf8");
+    assert.match(unslop, /scan/i, "missing step 1 (scan)");
+    assert.match(unslop, /rewrite/i, "missing step 2 (rewrite)");
+    assert.match(unslop, /self-audit/i, "missing step 3 (self-audit)");
+    assert.match(unslop, /R-\d+/, "missing stable rule IDs");
+    assert.match(
+      unslop,
+      /any language|não apenas|Espero que isso ajude/,
+      "missing language independence or Portuguese examples"
+    );
+    assert.match(unslop, /PROJECT\.md/, "coverage list missing project files");
+    assert.match(unslop, /TASK\.md/, "coverage list missing TASK.md bodies");
+    assert.match(unslop, /tracker/, "coverage list missing tracker issues");
+    assert.match(unslop, /AGENTS\.md/, "coverage list missing AGENTS.md/CLAUDE.md");
+    assert.match(unslop, /prose/i, "scope guard missing prose side");
+    assert.match(unslop, /technical/i, "scope guard missing technical side");
+  } finally {
+    await removeTemp(dir);
+  }
+});
+
 test("init accepts multiple harnesses via flag", async () => {
   const dir = await makeTempRepo();
   try {
