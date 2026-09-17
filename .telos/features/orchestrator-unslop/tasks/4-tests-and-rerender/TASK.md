@@ -3,6 +3,7 @@ feature: orchestrator-unslop
 task: 4
 title: Extend the test suite, run it, and re-render this repo
 status: pending
+issue: 26
 depends_on: [1, 2, 3]
 requirements: [REQ-1, REQ-4, REQ-5, REQ-6]
 ---

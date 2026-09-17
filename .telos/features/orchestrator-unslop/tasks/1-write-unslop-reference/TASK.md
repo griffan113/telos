@@ -3,6 +3,7 @@ feature: orchestrator-unslop
 task: 1
 title: Author references/unslop.md and land the in-repo copies
 status: pending
+issue: 23
 depends_on: []
 requirements: [REQ-1, REQ-3, REQ-4, REQ-7]
 ---

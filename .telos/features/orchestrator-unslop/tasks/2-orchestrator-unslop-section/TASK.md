@@ -3,6 +3,7 @@ feature: orchestrator-unslop
 task: 2
 title: Add the unslop section to agents/orchestrator.md
 status: pending
+issue: 24
 depends_on: []
 requirements: [REQ-2, REQ-3, REQ-6]
 ---

@@ -3,6 +3,7 @@ feature: orchestrator-unslop
 task: 3
 title: Add the unslop section to the six remaining agent sources
 status: pending
+issue: 25
 depends_on: []
 requirements: [REQ-3, REQ-6]
 ---
