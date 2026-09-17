@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { upsertAgentsMd } from "./agents-md.js";
-import { HARNESS_IDS, HARNESS_LABELS, TRACKER_IDS } from "./detect.js";
+import { HARNESS_LABELS, validatedHarnesses, validatedLanguage, validatedTracker } from "./detect.js";
 import { CliError } from "./errors.js";
 import { writeRendered } from "./render.js";
 import { version } from "./version.js";
@@ -40,12 +40,7 @@ export async function update(flags = {}) {
   // Flag overrides are validated before anything is touched so bad input
   // never leaves a half-updated telos.json behind.
   if (flags.harness?.length) {
-    for (const id of flags.harness) {
-      if (!HARNESS_IDS.includes(id)) {
-        throw new CliError(`unknown harness: ${id}\nValid: ${HARNESS_IDS.join(", ")}`);
-      }
-    }
-    const next = [...new Set(flags.harness)];
+    const next = validatedHarnesses(flags.harness);
     if (!arrayEquals(next, config.harnesses)) {
       changelog.push(
         `telos.json: harnesses [${formatList(config.harnesses)}] → [${formatList(next)}]`
@@ -54,19 +49,14 @@ export async function update(flags = {}) {
     config.harnesses = next;
   }
   if (flags.tracker !== undefined) {
-    if (!TRACKER_IDS.includes(flags.tracker)) {
-      throw new CliError(
-        `unknown tracker: ${flags.tracker}\nValid: ${TRACKER_IDS.join(", ")}`
-      );
-    }
-    if (config.tracker !== flags.tracker) {
-      changelog.push(`telos.json: tracker ${config.tracker ?? "(none)"} → ${flags.tracker}`);
-      config.tracker = flags.tracker;
+    const tracker = validatedTracker(flags.tracker);
+    if (config.tracker !== tracker) {
+      changelog.push(`telos.json: tracker ${config.tracker ?? "(none)"} → ${tracker}`);
+      config.tracker = tracker;
     }
   }
   if (flags.lang !== undefined) {
-    const lang = flags.lang.trim();
-    if (!lang) throw new CliError("--lang needs a non-empty value");
+    const lang = validatedLanguage(flags.lang);
     if (config.language !== lang) {
       changelog.push(`telos.json: language ${config.language ?? "(none)"} → ${lang}`);
       config.language = lang;
@@ -99,7 +89,7 @@ export async function update(flags = {}) {
   const rendered = await writeRendered(cwd, config.harnesses, version);
   const marked = await upsertAgentsMd(cwd, config.language);
   console.log(`
-Re-rendered agent files for: ${config.harnesses.map((h) => HARNESS_LABELS[h] ?? h).join(", ")}
+Re-rendered agent files for: ${formatList(config.harnesses)}
   overwritten: ${rendered.written.length}
   skipped:     ${rendered.skipped.length} (user-owned, no generated marker)
   marked:      ${marked.file} (${marked.changed ? "## Telos Framework block reconciled" : "block already current"})

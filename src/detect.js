@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { CliError } from "./errors.js";
 
 export const HARNESS_IDS = ["opencode", "claude-code", "copilot", "codex"];
 
@@ -11,6 +12,30 @@ export const HARNESS_LABELS = {
 };
 
 export const TRACKER_IDS = ["local", "github", "azure"];
+
+// Shared with init and update so both accept the same values and normalize
+// them the same way (validation never changes stored data).
+export function validatedHarnesses(ids) {
+  for (const id of ids) {
+    if (!HARNESS_IDS.includes(id)) {
+      throw new CliError(`unknown harness: ${id}\nValid: ${HARNESS_IDS.join(", ")}`);
+    }
+  }
+  return [...new Set(ids)];
+}
+
+export function validatedTracker(tracker) {
+  if (!TRACKER_IDS.includes(tracker)) {
+    throw new CliError(`unknown tracker: ${tracker}\nValid: ${TRACKER_IDS.join(", ")}`);
+  }
+  return tracker;
+}
+
+export function validatedLanguage(lang) {
+  const trimmed = (lang ?? "").trim();
+  if (!trimmed) throw new CliError("--lang needs a non-empty value");
+  return trimmed;
+}
 
 function exists(target) {
   try {
